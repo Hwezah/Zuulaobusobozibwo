@@ -27,10 +27,9 @@ export default function EventsPage() {
 
       <Section>
         <EventsView />
-      </Section>
-
-      <Section className="pt-0">
-        <SpeakerCTA />
+        <div className="mt-8">
+          <SpeakerCTA />
+        </div>
       </Section>
     </>
   );

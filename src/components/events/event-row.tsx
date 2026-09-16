@@ -13,7 +13,7 @@ export function EventRow({ event }: { event: EventItem }) {
   return (
     <div
       data-eventrow
-      className="grid grid-cols-[64px_1fr] items-center gap-5 rounded-[18px] border border-border bg-card-2 p-5 shadow-[0_6px_22px_rgba(60,30,80,.06)] sm:grid-cols-[72px_1fr_auto] sm:gap-6 max-[560px]:grid-cols-1 max-[560px]:gap-3 max-[560px]:text-center"
+      className="grid grid-cols-[64px_1fr] items-center gap-5 rounded-[20px] border border-border bg-card-2 px-6 py-8 shadow-[0_6px_22px_rgba(60,30,80,.06)] sm:grid-cols-[72px_1fr_auto] sm:gap-6 sm:px-8 sm:py-10 max-[560px]:grid-cols-1 max-[560px]:gap-3 max-[560px]:px-5 max-[560px]:py-6 max-[560px]:text-center"
     >
       <div
         data-ev-date
