@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Moon, Search, ShoppingBag, Sun } from "lucide-react";
+import { Menu, Search, ShoppingBag } from "lucide-react";
 import { Logo } from "./logo";
 import { NAV_LINKS, SECONDARY_LINKS } from "./nav-links";
 import { SearchDialog } from "./search-dialog";
@@ -11,7 +11,6 @@ import { CartDrawer } from "./cart-drawer";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useCart } from "@/context/cart-context";
-import { useTheme } from "@/context/theme-context";
 import { cn } from "@/lib/utils";
 
 function IconButton({
@@ -38,7 +37,6 @@ function IconButton({
 export function SiteHeader() {
   const pathname = usePathname();
   const { count, setOpen } = useCart();
-  const { theme, toggle } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -47,8 +45,8 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border backdrop-blur-xl" style={{ background: "var(--header)" }}>
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-30 border-b border-border backdrop-blur-xl" style={{ background: "var(--header)" }}>
+        <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
           <Logo />
 
           <nav data-nav className="mx-auto hidden items-center gap-1 lg:flex">
@@ -57,23 +55,34 @@ export function SiteHeader() {
                 key={l.href}
                 href={l.href}
                 className={cn(
-                  "rounded-full px-4 py-2 text-[14px] font-semibold transition-colors",
-                  isActive(l.href)
-                    ? "bg-chip text-text"
-                    : "text-muted hover:text-text",
+                  "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[14px] font-semibold transition-colors",
+                  isActive(l.href) ? "text-text" : "text-muted hover:text-text",
                 )}
               >
                 {l.label}
+                {"live" in l && l.live && (
+                  <span
+                    aria-hidden
+                    className="h-1.5 w-1.5 rounded-full bg-pink"
+                    style={{ animation: "evdot 1.9s ease-in-out infinite" }}
+                  />
+                )}
               </Link>
             ))}
           </nav>
 
-          <div className="ml-auto flex items-center gap-2 lg:ml-0">
+          <div className="ml-auto flex items-center gap-2 lg:ml-0 lg:gap-3">
+            <Link
+              href="/booking"
+              className="hidden text-[14px] font-semibold text-muted transition-colors hover:text-text lg:inline"
+            >
+              Book Joseph
+            </Link>
+            <Button asChild shape="pill" size="sm" className="hidden lg:inline-flex">
+              <Link href="/mentorship">Join Mentorship</Link>
+            </Button>
             <IconButton label="Search" onClick={() => setSearchOpen(true)}>
               <Search className="h-[18px] w-[18px]" />
-            </IconButton>
-            <IconButton label="Toggle theme" onClick={toggle}>
-              {theme === "dark" ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
             </IconButton>
             <IconButton label="Open cart" onClick={() => setOpen(true)}>
               <ShoppingBag className="h-[18px] w-[18px]" />
@@ -83,9 +92,6 @@ export function SiteHeader() {
                 </span>
               )}
             </IconButton>
-            <Button asChild shape="pill" size="sm" className="hidden lg:inline-flex">
-              <Link href="/booking">Book Joseph</Link>
-            </Button>
             <button
               data-mobmenu
               type="button"
@@ -111,7 +117,7 @@ export function SiteHeader() {
           <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-4">
             {[...NAV_LINKS, ...SECONDARY_LINKS].map((l) => (
               <Link
-                key={l.href}
+                key={l.href + l.label}
                 href={l.href}
                 onClick={() => setMenuOpen(false)}
                 className={cn(
@@ -125,8 +131,8 @@ export function SiteHeader() {
           </nav>
           <div className="border-t border-border p-4">
             <Button asChild shape="pill" className="w-full">
-              <Link href="/booking" onClick={() => setMenuOpen(false)}>
-                Book Joseph to speak
+              <Link href="/mentorship" onClick={() => setMenuOpen(false)}>
+                Join Mentorship
               </Link>
             </Button>
           </div>

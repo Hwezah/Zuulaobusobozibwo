@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Stat } from "@/components/common";
-import { ROT_WORDS, STATS } from "@/data/site";
+import { ImageWell } from "@/components/image-well";
+import { ROT_WORDS, STATS, HERO, TOPIC_STRIP } from "@/data/site";
 
 function useTyping(words: string[]) {
   const [text, setText] = useState("");
@@ -49,67 +49,103 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden">
-      {/* ambient glow blobs — dimmed away in light theme via tokens */}
       <div
         aria-hidden
         className="hide-in-light pointer-events-none absolute -left-40 -top-40 h-96 w-96 rounded-full blur-3xl"
-        style={{ background: "rgba(255,45,149,.32)", animation: "glow 6s ease-in-out infinite" }}
+        style={{ background: "rgba(255,45,149,.28)", animation: "glow 6s ease-in-out infinite" }}
       />
       <div
         aria-hidden
-        className="hide-in-light pointer-events-none absolute -right-40 top-20 h-96 w-96 rounded-full blur-3xl"
-        style={{ background: "rgba(139,47,214,.34)", animation: "glow 7s ease-in-out infinite" }}
+        className="hide-in-light pointer-events-none absolute right-0 top-40 h-[28rem] w-[28rem] rounded-full blur-3xl"
+        style={{ background: "rgba(139,47,214,.3)", animation: "glow 7s ease-in-out infinite" }}
       />
 
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
-        <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-          <span
-            data-hero-eyebrow
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-chip px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.16em] text-pink-hover"
-          >
-            Zuula Obusobozibwo · Kingdom Business
-          </span>
-
-          <h1 className="mt-6 font-display text-[clamp(38px,6.4vw,66px)] font-extrabold leading-[1.04] tracking-[-1px] text-text">
-            Awakening purpose in{" "}
-            <span className="whitespace-nowrap">
-              <span className="text-gradient">{rot}</span>
-              <span
-                aria-hidden
-                className="ml-0.5 inline-block w-[3px] bg-pink align-middle"
-                style={{ height: "0.9em", animation: "caret 1s step-end infinite" }}
-              />
+      <div className="mx-auto max-w-7xl px-4 pb-8 pt-16 sm:px-6 sm:pt-20 lg:px-8">
+        <div data-grid2 className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+          {/* left: copy */}
+          <div className="max-[560px]:text-center">
+            <span
+              data-hero-eyebrow
+              className="inline-flex items-center gap-2 text-[14px] font-semibold text-text-3 max-[560px]:justify-center"
+            >
+              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-pink" />
+              {HERO.eyebrowPrefix}{" "}
+              <span className="text-pink-hover">
+                {rot}
+                <span
+                  aria-hidden
+                  className="ml-0.5 inline-block w-[2px] bg-pink align-middle"
+                  style={{ height: "1em", animation: "caret 1s step-end infinite" }}
+                />
+              </span>
             </span>
-          </h1>
 
-          <p className="mt-6 max-w-2xl text-[17px] leading-relaxed text-muted">
-            Not just priests — we are kings too. Rise into the marketplace mantle
-            through teaching, mentorship, live events and a library built to
-            unlock the potential God placed within you.
-          </p>
+            <h1 className="mt-5 font-display text-[clamp(40px,6vw,68px)] font-extrabold leading-[1.03] tracking-[-1.5px] text-text">
+              {HERO.headA}
+              <span className="text-gradient">{HERO.headB}</span>
+            </h1>
 
-          <div
-            data-cta-group
-            className="mt-9 flex flex-wrap items-center justify-center gap-3"
-          >
-            <Button asChild shape="pill" size="lg" data-cta>
-              <Link href="/events/kbs2026">
-                Get summit tickets <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" shape="pill" size="lg" data-cta>
-              <Link href="/mentorship">Explore mentorship</Link>
-            </Button>
+            <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-muted max-[560px]:mx-auto">
+              {HERO.sub}
+            </p>
+
+            <div
+              data-cta-group
+              className="mt-8 flex flex-wrap gap-3 max-[560px]:justify-center"
+            >
+              <Button asChild shape="pill" size="lg" data-cta>
+                <Link href="/mentorship">
+                  Join Mentorship <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" shape="pill" size="lg" data-cta>
+                <Link href="/events/kbs2026">Get Event Tickets</Link>
+              </Button>
+            </div>
+
+            <div
+              data-hero-stats
+              className="mt-12 flex flex-wrap gap-x-12 gap-y-6 max-[560px]:justify-center"
+            >
+              {STATS.map((s) => (
+                <div key={s.label} className="text-left max-[560px]:text-center">
+                  <div className="font-display text-[28px] font-extrabold text-text">{s.num}</div>
+                  <div className="mt-1 text-[13px] text-muted">{s.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div
-            data-hero-stats
-            className="mt-14 flex flex-wrap items-center justify-center gap-x-12 gap-y-6"
-          >
-            {STATS.map((s) => (
-              <Stat key={s.label} num={s.num} label={s.label} />
-            ))}
+          {/* right: portrait */}
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[24px] border border-border shadow-[0_24px_70px_rgba(60,30,80,.25)]">
+            <ImageWell
+              src="/assets/joseph-portrait.jpg"
+              label={HERO.portraitLabel}
+              className="absolute inset-0 h-full w-full"
+            />
+            <div className="absolute bottom-4 left-4 rounded-[14px] border border-border-2 bg-panel/90 px-4 py-3 backdrop-blur">
+              <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-pink-hover">
+                Next live event
+              </div>
+              <div className="mt-0.5 font-display text-[14px] font-bold text-text">
+                {HERO.nextEventLabel}
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* topic strip */}
+      <div className="border-y border-border bg-card">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-6 gap-y-2 px-4 py-4 sm:px-6 lg:px-8">
+          {TOPIC_STRIP.map((t, i) => (
+            <span key={t} className="flex items-center gap-6">
+              {i > 0 && <span aria-hidden className="text-pink/50">✦</span>}
+              <span className="text-[13px] font-semibold uppercase tracking-[0.14em] text-muted-2">
+                {t}
+              </span>
+            </span>
+          ))}
         </div>
       </div>
     </section>

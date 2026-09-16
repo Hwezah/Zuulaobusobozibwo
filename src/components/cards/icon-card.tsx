@@ -14,7 +14,7 @@ export function IconFeatureCard({
   const Icon = ICONS[data.ico];
   const inner = (
     <>
-      <span className="grid h-12 w-12 place-items-center rounded-[14px] bg-accent-grad text-white shadow-[0_8px_20px_rgba(255,45,149,.28)]">
+      <span className="grid h-12 w-12 place-items-center rounded-[14px] border border-[rgba(255,45,149,.28)] bg-[rgba(139,47,214,.16)] text-pink-hover">
         <Icon className="h-6 w-6" />
       </span>
       <div className="mt-4">

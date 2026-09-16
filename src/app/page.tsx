@@ -1,35 +1,29 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Hero } from "@/components/home/hero";
-import { TelegramCTA } from "@/components/home/telegram-cta";
+import { FounderSection } from "@/components/home/founder-section";
+import { FlagshipBand } from "@/components/home/flagship-band";
+import { PodcastBand } from "@/components/home/podcast-band";
+import { NewsletterCTA } from "@/components/home/newsletter-cta";
 import { Section, SectionHeading } from "@/components/common";
 import { Scroller } from "@/components/scroller";
-import { Button } from "@/components/ui/button";
-import { FeaturedEventCard } from "@/components/cards/event-card";
 import { BookCard } from "@/components/cards/book-card";
-import { ArticleCard } from "@/components/cards/article-card";
+import { EventPreviewCard } from "@/components/cards/event-preview-card";
 import { IconFeatureCard } from "@/components/cards/icon-card";
 import { TierCard } from "@/components/cards/tier-card";
 import { TestimonialCard } from "@/components/cards/testimonial-card";
 import { EVENTS } from "@/data/events";
 import { BOOKS } from "@/data/products";
-import { ARTICLES } from "@/data/articles";
 import { SERVICES, MEMBERSHIP_TIERS, TESTIMONIALS } from "@/data/site";
 
 export default function HomePage() {
-  const event = EVENTS[0];
-
   return (
     <>
       <Hero />
 
       {/* Services */}
       <Section>
-        <SectionHeading
-          eyebrow="What we do"
-          title="Everything you need to grow in purpose"
-          subtitle="Teaching, mentorship, events and resources — one ministry equipping believers to take dominion in the marketplace."
-        />
+        <SectionHeading eyebrow="Everything in one place" title="Ways to grow with Joseph" />
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((s) => (
             <IconFeatureCard key={s.title} data={s} />
@@ -37,88 +31,59 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* Featured event */}
-      {event && (
-        <Section>
-          <SectionHeading
-            eyebrow="Next event"
-            title="Kingdom Business Summit 2026"
-            subtitle="A full day of Kingdom business teaching, marketplace strategy and real-world testimony."
-          />
-          <div className="mt-12">
-            <FeaturedEventCard event={event} />
+      {/* Founder */}
+      <Section className="pt-0">
+        <FounderSection />
+      </Section>
+
+      {/* Flagship mentorship */}
+      <Section className="pt-0">
+        <FlagshipBand />
+      </Section>
+
+      {/* Events */}
+      <Section className="pt-0">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <span className="text-[12px] font-bold uppercase tracking-[0.16em] text-pink-hover">
+              Upcoming
+            </span>
+            <h2 className="mt-2 font-display text-[clamp(28px,4vw,42px)] font-extrabold tracking-[-0.5px] text-text">
+              Events &amp; tickets
+            </h2>
           </div>
-        </Section>
-      )}
+          <Link
+            href="/events"
+            className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-pink-hover"
+          >
+            View full calendar <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {EVENTS.map((e) => (
+            <EventPreviewCard key={e.id} event={e} />
+          ))}
+        </div>
+      </Section>
 
       {/* Library */}
-      <Section>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <SectionHeading
-            align="left"
-            eyebrow="Library"
-            title="Books, eBooks & audio"
-            subtitle="A curated library to deepen your faith and unlock potential."
-          />
-          <Button asChild variant="ghost" shape="pill" className="max-sm:hidden">
-            <Link href="/library">
-              Browse all <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-        <Scroller peek className="mt-10" cols="repeat(4,minmax(0,1fr))">
-          {BOOKS.slice(0, 4).map((b) => (
+      <Section className="pt-0">
+        <SectionHeading eyebrow="Library" title="Books, audio & podcast" />
+        <Scroller peek className="mt-12" cols="repeat(4,minmax(0,1fr))">
+          {BOOKS.map((b) => (
             <BookCard key={b.id} book={b} />
           ))}
         </Scroller>
       </Section>
 
-      {/* Articles */}
-      <Section>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <SectionHeading
-            align="left"
-            eyebrow="Insights"
-            title="Kingdom articles"
-            subtitle="Biblically-grounded reflections on purpose, stewardship and leadership."
-          />
-          <Button asChild variant="ghost" shape="pill" className="max-sm:hidden">
-            <Link href="/articles">
-              All articles <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-        <Scroller peek className="mt-10" cols="repeat(3,minmax(0,1fr))">
-          {ARTICLES.slice(0, 3).map((a) => (
-            <ArticleCard key={a.slug} article={a} />
-          ))}
-        </Scroller>
-      </Section>
-
-      {/* Mentorship teaser */}
-      <Section>
-        <SectionHeading
-          eyebrow="Membership"
-          title="Join the circle"
-          subtitle="Choose the level of support that fits your journey — from free resources to deep 1:1 work."
-        />
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {MEMBERSHIP_TIERS.map((t) => (
-            <TierCard key={t.name} tier={t} />
-          ))}
-        </div>
-        <div className="mt-8 text-center">
-          <Button asChild variant="link">
-            <Link href="/mentorship">
-              See full mentorship packages <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
+      {/* Podcast */}
+      <Section className="pt-0">
+        <PodcastBand />
       </Section>
 
       {/* Testimonials */}
-      <Section>
-        <SectionHeading eyebrow="Stories" title="Lives being transformed" />
+      <Section className="pt-0">
+        <SectionHeading eyebrow="Transformed lives" title="What people are saying" />
         <div className="mt-12 grid gap-5 lg:grid-cols-3">
           {TESTIMONIALS.map((t) => (
             <TestimonialCard key={t.name} {...t} />
@@ -126,9 +91,19 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* Telegram */}
-      <Section>
-        <TelegramCTA />
+      {/* Membership */}
+      <Section className="pt-0">
+        <SectionHeading eyebrow="Community" title="Join the membership" />
+        <div className="mt-14 grid gap-6 lg:grid-cols-3">
+          {MEMBERSHIP_TIERS.map((t) => (
+            <TierCard key={t.name} tier={t} />
+          ))}
+        </div>
+      </Section>
+
+      {/* Newsletter */}
+      <Section className="pt-0">
+        <NewsletterCTA />
       </Section>
     </>
   );

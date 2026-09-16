@@ -212,3 +212,63 @@ export const ROT_WORDS = [
   "your family",
   "your calling",
 ];
+
+/** Home hero copy (matches the signed-off design). */
+export const HERO = {
+  eyebrowPrefix: "Empowering you to impact",
+  headA: "Awaken your inner self & ",
+  headB: "rediscover your purpose",
+  sub: "Step away from the noise and reconnect with who you truly are. Practical, biblically-grounded mentorship, courses and events to heal your inner world and activate your full potential.",
+  portraitLabel: "portrait of Joseph on stage",
+  nextEventLabel: "Kingdom Business Summit · Oct 24",
+};
+
+/** Divider strip under the hero. */
+export const TOPIC_STRIP = [
+  "Kingdom Stewardship",
+  "Purpose & Destiny",
+  "Healing & Wholeness",
+  "Leadership",
+  "Legacy Building",
+];
+
+export const FOUNDER = {
+  eyebrow: "About the founder",
+  name: "I'm Joseph Prosper",
+  intro:
+    "God has placed unique gifts within you. When you discover and use them, you step into your purpose, influence others, and fulfill your Kingdom destiny.",
+  quote:
+    "We believe every person carries a reservoir of strength and purpose, though life's challenges can blur that vision and leave us uncertain of who we are and where we're going.",
+  cta: "Invite Joseph to speak",
+};
+
+export const FLAGSHIP = {
+  eyebrow: "Flagship program",
+  title: "1:1 Mentorship & Coaching",
+  desc: "A guided journey to discover your gifts, heal your inner world, and build a life of Kingdom impact — with personal accountability from Joseph.",
+  cta: "Explore mentorship",
+  perks: [
+    "Monthly 1:1 sessions with Joseph",
+    "Personalized purpose roadmap",
+    "Private community access",
+    "Accountability & prayer support",
+  ],
+};
+
+export const PODCAST_BAND = {
+  title: "The Zuula Podcast",
+  desc: "Weekly conversations on purpose, healing and Kingdom leadership. New episodes every Tuesday.",
+  cta: "Listen & watch",
+};
+
+export const NEWSLETTER = {
+  title: "Begin your journey today",
+  desc: "Get weekly encouragement, new resources and early event access — straight to your inbox.",
+};
+
+export const FOOTER = {
+  blurb:
+    "Transform your life through deeply practical, biblically grounded insights designed to awaken your purpose, heal your inner world, and activate your full potential.",
+  phones: ["0753 844 033", "0757 217 681"],
+  developer: { name: "Hwezah", phone: "0742 696 385" },
+};

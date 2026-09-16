@@ -5,6 +5,7 @@ import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { EventRibbon } from "@/components/site/event-ribbon";
+import { ThemeToggle } from "@/components/site/theme-toggle";
 import { themeScript } from "@/context/theme-context";
 
 const sora = Sora({
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SiteHeader />
           <main className="flex-1">{children}</main>
           <SiteFooter />
+          <ThemeToggle />
         </Providers>
       </body>
     </html>

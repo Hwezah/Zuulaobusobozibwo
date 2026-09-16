@@ -186,6 +186,26 @@ a:hover {
   display: none !important;
 }
 
+/* diagonal-stripe placeholder well (portraits / missing images) */
+.pattern-well {
+  background: repeating-linear-gradient(
+    45deg,
+    #1a1230,
+    #1a1230 12px,
+    #221a3a 12px,
+    #221a3a 24px
+  );
+}
+:root[data-theme="light"] .pattern-well {
+  background: repeating-linear-gradient(
+    45deg,
+    #ece3d3,
+    #ece3d3 12px,
+    #e2d7c3 12px,
+    #e2d7c3 24px
+  );
+}
+
 /* ------------------------------------------------------------------ *
  * keyframes (from the prototype)
  * ------------------------------------------------------------------ */

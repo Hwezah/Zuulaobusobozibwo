@@ -1,26 +1,27 @@
 import Link from "next/link";
+import { Phone } from "lucide-react";
 import { Logo } from "./logo";
-import { SOCIAL_LINKS, CONTACTS } from "@/data/site";
+import { SOCIAL_LINKS, FOOTER } from "@/data/site";
 
 const COLUMNS: { key: string; heading: string; links: { href: string; label: string }[] }[] = [
   {
     key: "explore",
     heading: "Explore",
     links: [
-      { href: "/", label: "Home" },
-      { href: "/events", label: "Events" },
-      { href: "/library", label: "Library" },
       { href: "/mentorship", label: "Mentorship" },
+      { href: "/events", label: "Events" },
+      { href: "/booking", label: "Book Joseph" },
+      { href: "/library", label: "Library" },
     ],
   },
   {
     key: "resources",
     heading: "Resources",
     links: [
-      { href: "/articles", label: "Articles" },
+      { href: "/library?filter=eBook", label: "eBooks" },
+      { href: "/library?filter=Audiobook", label: "Audio" },
       { href: "/podcast", label: "Podcast" },
-      { href: "/booking", label: "Book Joseph" },
-      { href: "/library", label: "eBooks & Audio" },
+      { href: "/articles", label: "Articles" },
     ],
   },
   {
@@ -29,8 +30,9 @@ const COLUMNS: { key: string; heading: string; links: { href: string; label: str
     links: [
       { href: "/about", label: "About" },
       { href: "/contact", label: "Contact" },
-      { href: "/privacy", label: "Privacy" },
+      { href: "/privacy", label: "Privacy Policy" },
       { href: "/terms", label: "Terms" },
+      { href: "/admin", label: "Team login" },
     ],
   },
 ];
@@ -45,19 +47,17 @@ export function SiteFooter() {
         >
           <div data-fbrand className="order-1 flex w-full flex-col items-center gap-4 text-center lg:w-auto lg:items-start lg:text-left">
             <Logo />
-            <p className="max-w-xs text-[14px] leading-relaxed text-muted">
-              A Kingdom-business ministry equipping believers to rise into the
-              marketplace mantle — not just priests, but kings too.
-            </p>
-            <div data-fcontacts className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[13px] font-semibold text-text-3 lg:justify-start">
-              {CONTACTS.enquiries.map((n) => (
+            <p className="max-w-xs text-[14px] leading-relaxed text-muted">{FOOTER.blurb}</p>
+            <div data-fcontacts className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[13px] font-semibold text-text-3 lg:justify-start">
+              <Phone className="h-4 w-4 text-pink" />
+              {FOOTER.phones.map((n) => (
                 <span key={n}>{n}</span>
               ))}
             </div>
           </div>
 
           {COLUMNS.map((col, i) => (
-            <div key={col.key} data-fcol className="order-2 min-w-[120px] flex-1" style={{ order: i + 2 }}>
+            <div key={col.key} data-fcol className="min-w-[120px] flex-1" style={{ order: i + 2 }}>
               <h4 className="mb-4 text-[13px] font-bold uppercase tracking-[0.16em] text-muted-2">
                 {col.heading}
               </h4>
@@ -74,14 +74,14 @@ export function SiteFooter() {
           ))}
         </div>
 
-        <div data-fsocialrow className="mt-12 flex gap-2.5">
+        <div data-fsocialrow className="mt-12 flex flex-wrap gap-2.5">
           {SOCIAL_LINKS.map((s) => (
             <a
               key={s.label}
               href={s.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-chip px-3 py-2.5 text-[12.5px] font-semibold text-text-3 transition-colors hover:border-border-strong hover:text-text"
+              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-chip px-6 py-2.5 text-[12.5px] font-semibold text-text-3 transition-colors hover:border-border-strong hover:text-text sm:flex-none"
             >
               {s.label}
             </a>
@@ -97,10 +97,8 @@ export function SiteFooter() {
           </span>
           <span className="flex-1 text-right max-[560px]:basis-full max-[560px]:text-center">
             Website developed by{" "}
-            <span className="font-semibold text-text-3">Hwezah</span> ·{" "}
-            <Link href="/admin" className="text-muted-2 hover:text-pink-hover">
-              Admin
-            </Link>
+            <span className="font-semibold text-text-3">{FOOTER.developer.name}</span> —{" "}
+            {FOOTER.developer.phone}
           </span>
         </div>
       </div>

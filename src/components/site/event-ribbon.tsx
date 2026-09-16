@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { X } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import { EVENTS } from "@/data/events";
 
 const KEY = "zuula-ribbon-hidden";
@@ -22,9 +22,7 @@ export function EventRibbon() {
 
   if (hidden || !ev) return null;
 
-  function dismiss(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
+  function dismiss() {
     setHidden(true);
     try {
       sessionStorage.setItem(KEY, "1");
@@ -38,19 +36,26 @@ export function EventRibbon() {
         className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 bg-white/20 blur-md"
         style={{ animation: "ribbonshine 3.4s ease-in-out infinite" }}
       />
-      <Link
-        href={`/events/${ev.id}`}
+      <div
         data-ribbonrow
-        className="relative mx-auto flex max-w-7xl items-center justify-center gap-3 px-4 py-2.5 text-center text-white hover:text-white"
+        className="relative mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8"
       >
-        <span
-          data-ribbontext
-          className="text-[13.5px] font-semibold"
-        >
-          <span aria-hidden className="mr-2 inline-block h-2 w-2 rounded-full bg-white align-middle" style={{ animation: "evdot 1.9s ease-in-out infinite" }} />
-          {ev.title} · Sat 24 Oct · {ev.place.split(",")[0]} —{" "}
-          <span className="underline underline-offset-2">Get tickets</span>
-        </span>
+        <div data-ribbontext className="flex flex-1 items-center justify-center gap-3 max-[560px]:justify-start">
+          <span className="flex items-center gap-2 text-[13.5px] font-semibold max-[560px]:text-[12.5px]">
+            <span
+              aria-hidden
+              className="inline-block h-2 w-2 rounded-full bg-white"
+              style={{ animation: "evdot 1.9s ease-in-out infinite" }}
+            />
+            {ev.title} · Sat 24 Oct · {ev.place.split(",")[0]}
+          </span>
+          <Link
+            href={`/events/${ev.id}`}
+            className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-4 py-1.5 text-[13px] font-bold text-white backdrop-blur transition-colors hover:bg-white/30 max-[560px]:hidden"
+          >
+            Get tickets <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
         <button
           data-ribbonclose
           type="button"
@@ -60,7 +65,7 @@ export function EventRibbon() {
         >
           <X className="h-4 w-4" />
         </button>
-      </Link>
+      </div>
     </div>
   );
 }
