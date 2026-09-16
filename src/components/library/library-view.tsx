@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Chip, SectionHeading } from "@/components/common";
+import { Chip } from "@/components/common";
 import { BookCard } from "@/components/cards/book-card";
 import { BOOKS, LIBRARY_FILTERS } from "@/data/products";
 
@@ -20,13 +20,7 @@ export function LibraryView() {
 
   return (
     <>
-      <SectionHeading
-        eyebrow="Library"
-        title="Books, eBooks & audio"
-        subtitle="A curated library to deepen your faith and unlock the potential God placed within you."
-      />
-
-      <div className="mt-8 flex flex-wrap justify-center gap-2.5">
+      <div className="flex flex-wrap justify-center gap-2.5">
         {LIBRARY_FILTERS.map((f) => (
           <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>
             {f}

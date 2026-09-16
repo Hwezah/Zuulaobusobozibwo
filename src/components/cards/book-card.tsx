@@ -27,9 +27,12 @@ export function BookCard({ book }: { book: Product }) {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col px-1 pt-3">
+      <div className="flex flex-1 flex-col px-1 pt-4">
+        <span className="mb-2 inline-flex w-fit items-center rounded-full border border-[rgba(255,45,149,.4)] bg-[rgba(255,45,149,.1)] px-3 py-0.5 text-[11px] font-semibold text-pink-hover">
+          {book.type}
+        </span>
         <h3 className="font-display text-[16px] font-bold leading-tight text-text">{book.title}</h3>
-        <p className="mt-1 text-[13px] text-muted">{book.type}</p>
+        <p className="mt-1.5 line-clamp-2 min-h-[2.6rem] text-[13.5px] leading-relaxed text-muted">{book.desc}</p>
         <button
           type="button"
           onClick={() => add(book.id)}
