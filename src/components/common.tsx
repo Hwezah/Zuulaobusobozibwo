@@ -128,6 +128,23 @@ export function Card({
   );
 }
 
+/** Consistent page-section wrapper (max width + symmetric side padding). */
+export function Section({
+  children,
+  className,
+  id,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  id?: string;
+}) {
+  return (
+    <section id={id} className={cn("mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8", className)}>
+      {children}
+    </section>
+  );
+}
+
 /** Number + label stat used in hero/booking/about rows. */
 export function Stat({ num, label }: { num: string; label: string }) {
   return (

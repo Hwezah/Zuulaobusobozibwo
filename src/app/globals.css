@@ -181,6 +181,11 @@ a:hover {
   background: var(--accent);
 }
 
+/* ambient glow blobs are dimmed away in light theme (see light-theme.css) */
+:root[data-theme="light"] .hide-in-light {
+  display: none !important;
+}
+
 /* ------------------------------------------------------------------ *
  * keyframes (from the prototype)
  * ------------------------------------------------------------------ */
