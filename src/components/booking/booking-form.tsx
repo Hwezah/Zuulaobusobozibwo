@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, CalendarCheck } from "lucide-react";
+import { Sparkles, Lock, ArrowRight, CalendarCheck } from "lucide-react";
 import { ICONS } from "@/data/icons";
 import {
   BOOKING_TYPE_OPTIONS,
@@ -10,7 +10,6 @@ import {
 } from "@/data/site";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -42,23 +41,16 @@ export function BookingForm() {
 
   if (done) {
     return (
-      <div className="mx-auto max-w-lg rounded-[22px] border border-border bg-card-2 p-10 text-center">
+      <div className="rounded-[24px] border border-border bg-panel-2 p-8 text-center shadow-[0_24px_70px_rgba(60,30,80,.2)] sm:p-10">
         <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-accent-grad text-white">
           <CalendarCheck className="h-8 w-8" />
         </span>
-        <h2 className="mt-6 font-display text-[24px] font-extrabold text-text">
-          Request received
-        </h2>
+        <h2 className="mt-6 font-display text-[24px] font-extrabold text-text">Request received</h2>
         <p className="mt-3 text-[15px] leading-relaxed text-muted">
           Thank you — we&apos;ll review your {bType.toLowerCase()} request and get
           back to you within 48 hours to confirm details.
         </p>
-        <Button
-          variant="ghost"
-          shape="pill"
-          className="mt-6"
-          onClick={() => setDone(false)}
-        >
+        <Button variant="ghost" shape="pill" className="mt-6" onClick={() => setDone(false)}>
           Submit another request
         </Button>
       </div>
@@ -66,11 +58,23 @@ export function BookingForm() {
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-2xl rounded-[22px] border border-border bg-card-2 p-6 sm:p-8">
-      {/* Type */}
-      <fieldset>
-        <legend className="text-[13px] font-semibold text-text-3">Type of engagement</legend>
-        <div data-typegrid className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <form
+      onSubmit={submit}
+      className="rounded-[24px] border border-border bg-panel-2 p-6 shadow-[0_24px_70px_rgba(60,30,80,.2)] sm:p-8"
+    >
+      <div className="flex items-center gap-3">
+        <span className="grid h-11 w-11 place-items-center rounded-[12px] bg-accent-grad text-white">
+          <Sparkles className="h-6 w-6" />
+        </span>
+        <h2 className="font-display text-[20px] font-extrabold text-text">Request a date</h2>
+      </div>
+
+      {/* Engagement type */}
+      <fieldset className="mt-6">
+        <legend className="text-[12px] font-bold uppercase tracking-[0.14em] text-muted-2">
+          Engagement type
+        </legend>
+        <div data-typegrid className="mt-3 grid grid-cols-2 gap-3">
           {BOOKING_TYPE_OPTIONS.map((t) => {
             const Icon = ICONS[t.ico];
             const active = bType === t.label;
@@ -80,14 +84,16 @@ export function BookingForm() {
                 type="button"
                 onClick={() => setBType(t.label)}
                 className={cn(
-                  "flex flex-col items-center gap-2 rounded-[14px] border px-3 py-4 text-center transition-colors",
+                  "flex items-center gap-2.5 rounded-[14px] border px-4 py-4 text-left transition-colors",
                   active
-                    ? "border-[var(--pink)] bg-[linear-gradient(135deg,rgba(255,45,149,.22),rgba(139,47,214,.22))] text-text"
-                    : "border-border-2 bg-card text-muted hover:text-text",
+                    ? "border-[var(--pink)] bg-[rgba(255,45,149,.1)]"
+                    : "border-border-2 bg-card hover:border-border-strong",
                 )}
               >
-                <Icon className="h-6 w-6" />
-                <span className="text-[13px] font-semibold">{t.label}</span>
+                <Icon className={cn("h-5 w-5 shrink-0", active ? "text-pink-hover" : "text-muted")} />
+                <span className={cn("text-[14px] font-bold", active ? "text-text" : "text-muted")}>
+                  {t.label}
+                </span>
               </button>
             );
           })}
@@ -96,8 +102,10 @@ export function BookingForm() {
 
       {/* Format */}
       <fieldset className="mt-6">
-        <legend className="text-[13px] font-semibold text-text-3">Format</legend>
-        <div data-momotab className="mt-3 flex gap-3">
+        <legend className="text-[12px] font-bold uppercase tracking-[0.14em] text-muted-2">
+          Format
+        </legend>
+        <div className="mt-3 grid grid-cols-2 gap-3">
           {BOOKING_FORMATS.map((f) => {
             const active = bFormat === f;
             return (
@@ -106,10 +114,10 @@ export function BookingForm() {
                 type="button"
                 onClick={() => setBFormat(f)}
                 className={cn(
-                  "flex-1 rounded-[14px] border px-4 py-3 text-center text-[14px] font-semibold transition-colors",
+                  "rounded-[14px] px-4 py-3.5 text-center text-[14px] font-bold transition-colors",
                   active
-                    ? "border-[var(--pink)] bg-accent-grad text-white"
-                    : "border-border-2 bg-card text-muted hover:text-text",
+                    ? "bg-accent-grad text-white"
+                    : "border border-border-2 bg-card text-muted hover:text-text",
                 )}
               >
                 {f}
@@ -120,29 +128,14 @@ export function BookingForm() {
       </fieldset>
 
       {/* Fields */}
-      <div data-formrow className="mt-6 grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="bk-name">Full name</Label>
-          <Input id="bk-name" name="name" required placeholder="Your name" />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="bk-email">Email</Label>
-          <Input id="bk-email" name="email" type="email" required placeholder="you@example.com" />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="bk-org">Organization</Label>
-          <Input id="bk-org" name="org" placeholder="Church, company or ministry" />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="bk-date">Preferred date</Label>
-          <Input id="bk-date" name="date" type="date" />
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-col gap-2">
-        <Label>Audience size</Label>
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <Input name="name" required placeholder="Full name" aria-label="Full name" />
+        <Input name="org" placeholder="Organization" aria-label="Organization" />
+        <Input name="email" type="email" required placeholder="Email address" aria-label="Email address" />
+        <Input name="phone" inputMode="tel" placeholder="Phone" aria-label="Phone" />
+        <Input name="date" type="date" placeholder="Preferred date" aria-label="Preferred date" className="text-muted" />
         <Select value={audience} onValueChange={setAudience}>
-          <SelectTrigger>
+          <SelectTrigger aria-label="Audience size">
             <SelectValue placeholder="Audience size" />
           </SelectTrigger>
           <SelectContent>
@@ -155,19 +148,28 @@ export function BookingForm() {
         </Select>
       </div>
 
-      <div className="mt-4 flex flex-col gap-2">
-        <Label htmlFor="bk-msg">Tell us about your event</Label>
-        <Textarea id="bk-msg" name="message" placeholder="Theme, goals, anything we should know…" />
+      <Textarea
+        name="message"
+        className="mt-3"
+        placeholder="Tell us about your event, audience and goals…"
+        aria-label="About your event"
+      />
+
+      {/* Summary */}
+      <div className="mt-5 flex items-center justify-between rounded-[14px] border border-border-2 bg-card px-4 py-3.5">
+        <span className="text-[14px] text-muted">Your request</span>
+        <span className="font-display text-[14px] font-bold text-pink-hover">
+          {bType} · {bFormat}
+          {audience ? ` · ${audience}` : ""}
+        </span>
       </div>
 
-      <div className="mt-5 rounded-[14px] border border-border bg-card px-4 py-3 text-[13px] text-muted">
-        Summary: <span className="font-semibold text-text-3">{bType} · {bFormat}</span>
-        {audience ? ` · ${audience}` : ""}
-      </div>
-
-      <Button type="submit" shape="pill" className="mt-6 w-full" disabled={submitting}>
-        {submitting ? "Sending…" : (<><Check className="h-4 w-4" /> Send booking request</>)}
+      <Button type="submit" size="lg" className="mt-4 w-full" disabled={submitting}>
+        {submitting ? "Sending…" : (<>Send booking request <ArrowRight className="h-4 w-4" /></>)}
       </Button>
+      <p className="mt-3 flex items-center justify-center gap-1.5 text-[12px] text-muted-2">
+        <Lock className="h-3.5 w-3.5" /> No commitment — we&apos;ll confirm availability within 48 hours.
+      </p>
     </form>
   );
 }

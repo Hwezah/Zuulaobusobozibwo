@@ -174,6 +174,20 @@ export const BOOKING_EXPECT = [
   "Optional Q&A or breakout session",
 ];
 
+export const BOOKING_HERO = {
+  eyebrow: "Book Joseph",
+  headA: "Bring Joseph to your ",
+  headB: "stage",
+  sub: "Keynotes, workshops, conferences and mentorship intensives — crafted to move your audience toward purpose. Share a few details and the team responds within 48 hours.",
+  expectHeading: "What you can expect",
+};
+
+export const BOOKING_TESTIMONIAL = {
+  quote:
+    "Joseph didn't just speak — he shifted the room. Our team is still talking about it months later.",
+  author: "Pastor Daniel — Life Church Kampala",
+};
+
 export const BOOKING_TYPE_OPTIONS: { label: string; ico: IconKey }[] = [
   { label: "Keynote", ico: "mic" },
   { label: "Workshop", ico: "building" },
