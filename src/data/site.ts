@@ -275,6 +275,13 @@ export const NEWSLETTER = {
   desc: "Get weekly encouragement, new resources and early event access — straight to your inbox.",
 };
 
+export const AUTHOR = {
+  name: "Tumusiime Joseph Prosper",
+  initials: "JP",
+  img: "/assets/joseph-founder.jpg",
+  bio: "Founder of Zuula Obusobozibwo — helping people discover their God-given gifts and use them to impact generations.",
+};
+
 export const FOOTER = {
   blurb:
     "Transform your life through deeply practical, biblically grounded insights designed to awaken your purpose, heal your inner world, and activate your full potential.",
