@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { CalendarX } from "lucide-react";
 import { EventRow } from "./event-row";
-import { Chip, SectionHeading } from "@/components/common";
+import { Chip } from "@/components/common";
 import { EVENTS, EVENT_FILTERS, EVENT_FILTER_TAG } from "@/data/events";
 
 export function EventsView() {
@@ -23,13 +23,7 @@ export function EventsView() {
 
   return (
     <>
-      <SectionHeading
-        eyebrow="Events"
-        title="Upcoming gatherings"
-        subtitle="Conferences and gatherings, in person and virtual — grab your seat early."
-      />
-
-      <div className="mt-8 flex flex-wrap justify-center gap-2.5">
+      <div className="flex flex-wrap justify-center gap-2.5">
         {EVENT_FILTERS.map((f) => (
           <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>
             {f}
@@ -48,10 +42,8 @@ export function EventsView() {
         <div className="mt-12 flex flex-col gap-10">
           {groups.map((g) => (
             <div key={g.month}>
-              <div className="mb-4 flex items-center gap-3">
-                <h3 className="font-display text-[15px] font-bold uppercase tracking-[0.14em] text-muted-2">
-                  {g.month}
-                </h3>
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <h2 className="font-display text-[18px] font-extrabold text-text">{g.month}</h2>
                 <span className="text-[13px] text-muted-3">
                   {g.items.length} event{g.items.length > 1 ? "s" : ""}
                 </span>
