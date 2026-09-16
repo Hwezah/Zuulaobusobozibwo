@@ -12,11 +12,12 @@ export function EventRibbon() {
   const ev = EVENTS[0];
 
   useEffect(() => {
+    let dismissed = false;
     try {
-      setHidden(sessionStorage.getItem(KEY) === "1");
-    } catch {
-      setHidden(false);
-    }
+      dismissed = sessionStorage.getItem(KEY) === "1";
+    } catch {}
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only hydration from sessionStorage
+    setHidden(dismissed);
   }, []);
 
   if (hidden || !ev) return null;

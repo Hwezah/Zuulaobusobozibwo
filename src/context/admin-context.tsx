@@ -26,6 +26,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only hydration from localStorage
       if (localStorage.getItem(KEY) === teamPin()) setAuthed(true);
     } catch {}
   }, []);

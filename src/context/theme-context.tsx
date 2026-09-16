@@ -20,6 +20,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const stored = localStorage.getItem(KEY) as Theme | null;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only hydration from localStorage
       if (stored === "dark" || stored === "light") setThemeState(stored);
     } catch {}
   }, []);
