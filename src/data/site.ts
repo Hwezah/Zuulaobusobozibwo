@@ -72,6 +72,8 @@ export interface PriceTier {
   featured: boolean;
   feats: string[];
   btn: string;
+  /** Badge shown on the featured tier (defaults to "Most popular"). */
+  badge?: string;
 }
 
 /** Home page membership teaser tiers. */
@@ -84,7 +86,7 @@ export const MEMBERSHIP_TIERS: PriceTier[] = [
 /** Mentorship page packages. */
 export const PACKAGES: PriceTier[] = [
   { name: "Clarity", tagline: "Find your direction", price: "UGX 150K", per: "", featured: false, feats: ["2 x 60-min sessions", "Purpose assessment", "Personalized action plan", "Email support"], btn: "Get started" },
-  { name: "Transformation", tagline: "The full journey", price: "UGX 400K", per: "/3mo", featured: true, feats: ["Monthly 1:1 sessions", "Personalized roadmap", "Community access", "WhatsApp accountability", "All courses included"], btn: "Apply now" },
+  { name: "Transformation", tagline: "The full journey", price: "UGX 400K", per: "/3mo", featured: true, badge: "Recommended", feats: ["Monthly 1:1 sessions", "Personalized roadmap", "Community access", "WhatsApp accountability", "All courses included"], btn: "Apply now" },
   { name: "Legacy Partner", tagline: "Deep, ongoing work", price: "UGX 900K", per: "/6mo", featured: false, feats: ["Bi-weekly 1:1 sessions", "Direct access to Joseph", "Custom growth plan", "Priority event access", "Guest at masterminds"], btn: "Apply now" },
 ];
 
@@ -108,6 +110,13 @@ export const MENTOR_PERKS = [
   "Private community access",
   "Accountability & prayer support",
 ];
+
+export const MENTOR_HERO = {
+  eyebrow: "1:1 Mentorship & Coaching",
+  headA: "Walk your journey to purpose ",
+  headB: "with a guide",
+  sub: "Personalized mentorship to help you discover your gifts, heal your inner world and step boldly into your Kingdom destiny.",
+};
 
 export const PODCAST_EPISODES = [
   { n: "42", title: "Rediscovering Your Essence", dur: "48 min", date: "Jul 2026", desc: "Strip away the noise and reconnect with who you were made to be." },

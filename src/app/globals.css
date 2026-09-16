@@ -148,12 +148,16 @@ h1, h2, h3, h4, h5 {
   font-family: var(--font-sora), "Sora", system-ui, sans-serif;
 }
 
-a {
-  color: var(--pink-link);
-  text-decoration: none;
-}
-a:hover {
-  color: var(--pink-hover);
+/* Base anchor styling lives in @layer base so Tailwind text-color utilities
+   (a later layer) win — e.g. a white or green link button rendered as <a>. */
+@layer base {
+  a {
+    color: var(--pink-link);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--pink-hover);
+  }
 }
 
 ::selection {

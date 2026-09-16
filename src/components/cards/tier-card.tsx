@@ -15,7 +15,7 @@ export function TierCard({ tier }: { tier: PriceTier }) {
     >
       {tier.featured && (
         <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent-grad px-4 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-          Most popular
+          {tier.badge ?? "Most popular"}
         </span>
       )}
 
