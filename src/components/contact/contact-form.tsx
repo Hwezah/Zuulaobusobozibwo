@@ -21,7 +21,7 @@ export function ContactForm() {
 
   if (done) {
     return (
-      <div className="rounded-[22px] border border-border bg-card-2 p-10 text-center">
+      <div className="rounded-[24px] border border-border bg-panel-2 p-8 text-center shadow-[0_24px_70px_rgba(60,30,80,.2)] sm:p-10">
         <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent-grad text-white">
           <Check className="h-7 w-7" strokeWidth={3} />
         </span>
@@ -36,7 +36,7 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={submit} className="rounded-[22px] border border-border bg-card-2 p-6 sm:p-8">
+    <form onSubmit={submit} className="rounded-[24px] border border-border bg-panel-2 p-6 shadow-[0_24px_70px_rgba(60,30,80,.2)] sm:p-8">
       <div data-formrow className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
           <Label htmlFor="ct-name">Name</Label>
