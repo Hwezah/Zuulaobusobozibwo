@@ -11,7 +11,10 @@ export function LegalPage({
 }) {
   return (
     <Section className="max-w-3xl">
-      <h1 className="font-display text-[clamp(30px,5vw,44px)] font-extrabold tracking-[-0.8px] text-text">
+      <span className="text-[13px] font-bold uppercase tracking-[0.18em] text-pink-hover">
+        Legal
+      </span>
+      <h1 className="mt-4 font-display text-[clamp(30px,5vw,44px)] font-extrabold tracking-[-0.8px] text-text">
         {title}
       </h1>
       <p className="mt-2 text-[13px] text-muted-2">Last updated {updated}</p>
