@@ -2,22 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  Check,
-  Copy,
-  ShoppingBag,
-  Upload,
-  X,
-  ShieldCheck,
-  ArrowRight,
-} from "lucide-react";
+import { Check, Copy, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { useOrders } from "@/context/orders-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { QtyStepper } from "@/components/common";
+import { ImageWell } from "@/components/image-well";
 import { PAY, PAY_STEPS, NEXT_STEPS } from "@/data/site";
 import { isValidUgPhone, makeRef, itemsSummary } from "@/lib/order";
 import { ugx, cn } from "@/lib/utils";
@@ -25,7 +17,7 @@ import { ugx, cn } from "@/lib/utils";
 const PROVIDERS = ["MTN Mobile Money", "Airtel Money"] as const;
 
 export function CheckoutView() {
-  const { lines, total, count, inc, dec, remove, clear } = useCart();
+  const { lines, total, count, clear } = useCart();
   const { addOrder } = useOrders();
 
   const [provider, setProvider] = useState<(typeof PROVIDERS)[number]>("MTN Mobile Money");
@@ -33,7 +25,6 @@ export function CheckoutView() {
   const [phone, setPhone] = useState("");
   const [attested, setAttested] = useState(false);
   const [touched, setTouched] = useState(false);
-  const [proofName, setProofName] = useState("");
   const [copied, setCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -178,68 +169,126 @@ export function CheckoutView() {
 
   // ----- checkout form -----
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_minmax(0,380px)]">
-      {/* Left: payment */}
-      <div className="order-2 flex flex-col gap-6 lg:order-1">
-        {/* provider tabs */}
-        <div className="flex gap-3">
-          {PROVIDERS.map((p) => (
-            <button
-              key={p}
-              type="button"
-              data-momotab
-              onClick={() => {
-                setProvider(p);
-                setCopied(false);
-              }}
-              className={cn(
-                "flex-1 rounded-[14px] border px-4 py-3.5 text-center text-[14px] font-semibold transition-colors",
-                provider === p
-                  ? "border-[var(--pink)] bg-accent-grad text-white"
-                  : "border-border-2 bg-card text-muted hover:text-text",
-              )}
-            >
-              {p}
-            </button>
-          ))}
+    <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,380px)_1fr]">
+      {/* Left: order summary (read-only) */}
+      <aside className="order-1">
+        <div data-cartpanel className="lg:sticky lg:top-24">
+          <div className="rounded-[18px] border border-border bg-card-2 p-6">
+            <h2 className="font-display text-[17px] font-bold text-text">Order summary</h2>
+            <ul className="mt-5 flex flex-col gap-4">
+              {lines.map(({ product, qty, lineTotal }) => (
+                <li key={product.id} data-orderitem className="flex items-center gap-3">
+                  <div className="relative shrink-0">
+                    <ImageWell
+                      src={product.img}
+                      className="h-14 w-14 rounded-[10px] border border-border"
+                    />
+                    <span className="absolute -right-2 -top-2 grid h-6 min-w-6 place-items-center rounded-full bg-accent-grad px-1.5 font-display text-[12px] font-bold text-white">
+                      {qty}
+                    </span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-display text-[14px] font-bold leading-tight text-text">
+                      {product.title}
+                    </p>
+                    <p className="mt-0.5 text-[12px] text-muted">{product.type}</p>
+                  </div>
+                  <span className="font-display text-[14px] font-bold text-text">
+                    {ugx(lineTotal)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-5 flex items-center justify-between border-t border-border pt-5">
+              <span className="text-[15px] text-muted">Total</span>
+              <span className="font-display text-[24px] font-extrabold text-text">
+                {ugx(total)}
+              </span>
+            </div>
+            <p className="mt-3 text-center text-[12px] text-muted-2">
+              Mobile Money only · All prices in UGX
+            </p>
+          </div>
+        </div>
+      </aside>
+
+      {/* Right: pay with Mobile Money */}
+      <div className="order-2 rounded-[18px] border border-border bg-card-2 p-6 max-[560px]:p-4 sm:p-8">
+        <h2 className="font-display text-[20px] font-extrabold text-text">
+          Pay with Mobile Money
+        </h2>
+
+        {/* provider select */}
+        <div className="mt-5">
+          <div className="text-[12px] font-bold uppercase tracking-[0.14em] text-muted-2">
+            Select provider
+          </div>
+          <div className="mt-3 flex gap-3">
+            {PROVIDERS.map((p) => (
+              <button
+                key={p}
+                type="button"
+                data-momotab
+                onClick={() => {
+                  setProvider(p);
+                  setCopied(false);
+                }}
+                className={cn(
+                  "flex-1 rounded-[14px] border px-4 py-3.5 text-center text-[14px] font-semibold transition-colors",
+                  provider === p
+                    ? "border-[var(--pink)] bg-accent-grad text-white"
+                    : "border-border-2 bg-card text-muted hover:text-text",
+                )}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* pay-to card */}
-        <div data-paycard className="rounded-[18px] border border-border bg-card-2 p-6 max-[560px]:p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-[12px] uppercase tracking-wide text-muted-2">
-                Send payment to
-              </div>
-              <div className="mt-1 font-display text-[26px] font-extrabold text-text">
-                {pay.number}
-              </div>
-              <div className="mt-0.5 text-[14px] text-muted">{PAY.name}</div>
-            </div>
+        {/* pay-to box */}
+        <div
+          data-paycard
+          className="mt-5 rounded-[18px] border border-[rgba(255,45,149,.4)] bg-[linear-gradient(135deg,rgba(139,47,214,.14),rgba(255,45,149,.08))] p-6 text-center max-[560px]:p-4"
+        >
+          <div className="text-[12px] font-bold uppercase tracking-[0.16em] text-pink-hover">
+            Send {ugx(total)} to
+          </div>
+          <div className="mt-2 font-display text-[32px] font-extrabold leading-none text-text max-[560px]:text-[26px]">
+            {pay.number}
+          </div>
+          <div className="mt-3 flex justify-center">
             <Button variant="ghost" shape="pill" size="sm" onClick={copyNumber}>
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copied ? "Copied" : "Copy"}
+              {copied ? "Copied" : "Copy number"}
             </Button>
           </div>
-
-          <ol className="mt-5 flex flex-col gap-3 border-t border-border pt-5">
-            {PAY_STEPS.map((s) => (
-              <li key={s.n} className="flex gap-3">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-chip font-display text-[13px] font-bold text-pink-hover">
-                  {s.n}
-                </span>
-                <div>
-                  <div className="text-[14px] font-semibold text-text">{s.t}</div>
-                  <p className="text-[13px] text-muted">{s.d}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <p className="mt-3 text-[13px] text-muted">
+            {provider} · Registered name:{" "}
+            <span className="font-semibold text-text-3">{PAY.name}</span>
+          </p>
         </div>
 
-        {/* details form */}
-        <div className="rounded-[18px] border border-border bg-card-2 p-6 max-[560px]:p-4">
-          <h2 className="font-display text-[17px] font-bold text-text">Your details</h2>
+        {/* pay steps */}
+        <ol className="mt-6 flex flex-col gap-3">
+          {PAY_STEPS.map((s) => (
+            <li key={s.n} className="flex gap-3">
+              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-chip font-display text-[13px] font-bold text-pink-hover">
+                {s.n}
+              </span>
+              <div>
+                <div className="text-[14px] font-semibold text-text">{s.t}</div>
+                <p className="text-[13px] text-muted">{s.d}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        {/* your details */}
+        <div className="mt-7 border-t border-border pt-6">
+          <div className="text-[12px] font-bold uppercase tracking-[0.14em] text-muted-2">
+            Your details
+          </div>
           <div className="mt-4 flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="co-name">Full name</Label>
@@ -255,46 +304,17 @@ export function CheckoutView() {
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="co-phone">Mobile Money number</Label>
+              <Label htmlFor="co-phone">Mobile Money number used to pay</Label>
               <Input
                 id="co-phone"
                 inputMode="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="07XX XXX XXX"
+                placeholder="e.g. 0772 000 000"
                 className={cn(touched && !phoneOk && "border-[rgba(255,90,90,.65)]")}
               />
               {touched && !phoneOk && (
                 <span className="text-[12px] text-[#ff8a8a]">Enter a valid 07XX number.</span>
-              )}
-            </div>
-
-            {/* proof upload (optional manual-verification path) */}
-            <div className="flex flex-col gap-2">
-              <Label>Proof of payment (optional)</Label>
-              {proofName ? (
-                <div className="flex items-center justify-between rounded-[12px] border border-border bg-card px-4 py-3 text-[14px]">
-                  <span className="truncate text-text-3">{proofName}</span>
-                  <button
-                    type="button"
-                    aria-label="Remove file"
-                    onClick={() => setProofName("")}
-                    className="text-muted hover:text-pink"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ) : (
-                <label className="flex cursor-pointer items-center gap-2 rounded-[12px] border border-dashed border-border-strong bg-card px-4 py-3 text-[14px] text-muted transition-colors hover:text-text">
-                  <Upload className="h-4 w-4" />
-                  Upload screenshot
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => setProofName(e.target.files?.[0]?.name ?? "")}
-                  />
-                </label>
               )}
             </div>
 
@@ -306,64 +326,20 @@ export function CheckoutView() {
                 className={cn(touched && !attested && "border-[rgba(255,90,90,.65)]")}
               />
               <span className="text-[13.5px] leading-relaxed text-muted">
-                I confirm I have sent the exact total to the number above via Mobile Money.
+                I confirm I have already sent {ugx(total)} from this number.
               </span>
             </label>
           </div>
 
-          <Button shape="pill" className="mt-6 w-full" disabled={submitting} onClick={submit}>
+          <Button className="mt-6 w-full" size="lg" disabled={submitting} onClick={submit}>
             {submitting ? "Submitting …" : `Submit payment · ${ugx(total)}`}
           </Button>
-          <p className="mt-3 flex items-center justify-center gap-1.5 text-[12px] text-muted-2">
-            <ShieldCheck className="h-4 w-4" /> We never store your Mobile Money PIN.
+          <p className="mt-4 text-center text-[12.5px] leading-relaxed text-muted-2">
+            Your order is held as pending until we confirm your Mobile Money payment. Unconfirmed
+            orders expire on their own — nothing is charged.
           </p>
         </div>
       </div>
-
-      {/* Right: order summary */}
-      <aside className="order-1 lg:order-2">
-        <div data-cartpanel className="lg:sticky lg:top-24">
-          <div className="rounded-[18px] border border-border bg-card-2 p-6">
-            <h2 className="font-display text-[17px] font-bold text-text">Order summary</h2>
-            <ul className="mt-4 flex flex-col gap-3">
-              {lines.map(({ product, qty, lineTotal }) => (
-                <li key={product.id} data-orderitem className="flex flex-col gap-2 border-b border-border pb-3 last:border-0 last:pb-0">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="font-display text-[14px] font-bold text-text">{product.title}</p>
-                      <p className="text-[12px] uppercase tracking-wide text-muted-2">{product.type}</p>
-                    </div>
-                    <button
-                      type="button"
-                      aria-label="Remove"
-                      onClick={() => remove(product.id)}
-                      className="text-muted transition-colors hover:text-pink"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <QtyStepper value={qty} onInc={() => inc(product.id)} onDec={() => dec(product.id)} />
-                    <span className="font-display text-[14px] font-bold text-text">{ugx(lineTotal)}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
-              <span className="text-[14px] text-muted">Total</span>
-              <span className="font-display text-[22px] font-extrabold text-text">{ugx(total)}</span>
-            </div>
-            <p className="mt-3 text-center text-[12px] text-muted-2">
-              Mobile Money only · All prices in UGX
-            </p>
-          </div>
-          <Button asChild variant="ghost" shape="pill" className="mt-3 w-full">
-            <Link href="/events">
-              Add more <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-      </aside>
     </div>
   );
 }

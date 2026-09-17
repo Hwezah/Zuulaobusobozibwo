@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ShoppingBag, Trash2 } from "lucide-react";
+import { ArrowRight, Lock } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -10,12 +10,13 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { QtyStepper } from "@/components/common";
+import { ImageWell } from "@/components/image-well";
 import { useCart } from "@/context/cart-context";
 import { ugx } from "@/lib/utils";
 
 export function CartDrawer() {
   const router = useRouter();
-  const { open, setOpen, lines, total, count, inc, dec, remove } = useCart();
+  const { open, setOpen, lines, total, inc, dec, remove } = useCart();
 
   function checkout() {
     setOpen(false);
@@ -25,12 +26,8 @@ export function CartDrawer() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetContent side="right" className="w-full sm:max-w-md">
-        <div className="flex items-center gap-2 border-b border-border px-5 py-5">
-          <ShoppingBag className="h-5 w-5 text-pink" />
+        <div className="flex items-center border-b border-border px-5 py-5">
           <SheetTitle>Your cart</SheetTitle>
-          <span className="ml-1 rounded-full bg-chip px-2 py-0.5 text-[12px] font-semibold text-muted">
-            {count}
-          </span>
         </div>
 
         {lines.length === 0 ? (
@@ -42,51 +39,56 @@ export function CartDrawer() {
           </div>
         ) : (
           <>
-            <div className="flex-1 overflow-y-auto px-5 py-4">
-              <ul className="flex flex-col gap-3">
-                {lines.map(({ product, qty, lineTotal }) => (
+            <div className="flex-1 overflow-y-auto px-5">
+              <ul className="flex flex-col">
+                {lines.map(({ product, qty }) => (
                   <li
                     key={product.id}
-                    className="flex flex-col gap-3 rounded-[14px] border border-border bg-card p-4"
+                    className="flex gap-3 border-b border-border py-5 last:border-0"
                   >
-                    <div className="flex items-start justify-between gap-3">
+                    <ImageWell
+                      src={product.img}
+                      className="h-14 w-14 shrink-0 rounded-[10px] border border-border"
+                    />
+                    <div className="flex min-w-0 flex-1 justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="truncate font-display text-[15px] font-bold text-text">
+                        <p className="font-display text-[14px] font-bold leading-tight text-text">
                           {product.title}
                         </p>
-                        <p className="text-[12px] uppercase tracking-wide text-muted-2">
-                          {product.type}
+                        <p className="mt-0.5 text-[12px] text-muted">{product.type}</p>
+                        <p className="mt-1 font-display text-[14px] font-bold text-pink-hover">
+                          {ugx(product.priceVal)}
                         </p>
+                        <div className="mt-3">
+                          <QtyStepper value={qty} onInc={() => inc(product.id)} onDec={() => dec(product.id)} />
+                        </div>
                       </div>
                       <button
                         type="button"
-                        aria-label="Remove"
                         onClick={() => remove(product.id)}
-                        className="text-muted transition-colors hover:text-pink"
+                        className="shrink-0 text-[13px] font-semibold text-muted transition-colors hover:text-pink"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        Remove
                       </button>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <QtyStepper value={qty} onInc={() => inc(product.id)} onDec={() => dec(product.id)} />
-                      <span className="font-display text-[15px] font-bold text-text">
-                        {ugx(lineTotal)}
-                      </span>
                     </div>
                   </li>
                 ))}
               </ul>
             </div>
+
             <div className="border-t border-border px-5 py-5">
               <div className="mb-4 flex items-center justify-between">
-                <span className="text-[14px] text-muted">Total</span>
-                <span className="font-display text-[20px] font-extrabold text-text">
+                <span className="text-[15px] text-muted">Subtotal</span>
+                <span className="font-display text-[22px] font-extrabold text-text">
                   {ugx(total)}
                 </span>
               </div>
-              <Button className="w-full" shape="pill" onClick={checkout}>
-                Checkout · {ugx(total)}
+              <Button className="w-full" size="lg" onClick={checkout}>
+                Proceed to checkout <ArrowRight className="h-4 w-4" />
               </Button>
+              <p className="mt-3 flex items-center justify-center gap-1.5 text-[12px] text-muted-2">
+                <Lock className="h-3.5 w-3.5" /> Secure payment via Mobile Money
+              </p>
             </div>
           </>
         )}
