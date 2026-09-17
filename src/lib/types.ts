@@ -81,6 +81,8 @@ export interface Article {
 export type OrderStatus = "pending" | "reminded" | "confirmed" | "failed";
 
 export interface Order {
+  /** Supabase row id — present only for server-backed orders, used for admin actions. */
+  id?: string;
   ref: string;
   name: string;
   phone: string;

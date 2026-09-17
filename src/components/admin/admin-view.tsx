@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Lock, LockKeyhole, Check, BellRing, ShieldAlert, X, Ban } from "lucide-react";
 import { useAdmin } from "@/context/admin-context";
 import { useOrders } from "@/context/orders-context";
@@ -45,6 +45,12 @@ function matchesFilter(order: Order, filter: Filter): boolean {
   }
 }
 
+interface RowActions {
+  onConfirm: (order: Order) => void;
+  onRemind: (order: Order) => void;
+  onReject: (order: Order, reason: string) => void;
+}
+
 function PinGate() {
   const { unlock } = useAdmin();
   const [pin, setPin] = useState("");
@@ -64,7 +70,7 @@ function PinGate() {
       <div>
         <h1 className="font-display text-[24px] font-extrabold text-text">Team access</h1>
         <p className="mt-2 text-[14px] text-muted">
-          Enter the team PIN to open the order console.
+          Enter the team PIN to view ticket orders.
         </p>
       </div>
       <form onSubmit={submit} className="flex w-full flex-col gap-3">
@@ -86,7 +92,7 @@ function PinGate() {
           </span>
         )}
         <Button type="submit" shape="pill" className="w-full">
-          Unlock console
+          Unlock
         </Button>
       </form>
       <p className="text-[12px] text-muted-2">
@@ -96,8 +102,7 @@ function PinGate() {
   );
 }
 
-function OrderRow({ order }: { order: Order }) {
-  const { confirm, remind, reject } = useOrders();
+function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
   const [arming, setArming] = useState(false);
   const [reason, setReason] = useState("");
   const meta = statusMeta(order.status);
@@ -108,7 +113,7 @@ function OrderRow({ order }: { order: Order }) {
   function decline() {
     const r = reason.trim();
     if (!r) return;
-    reject(order.ref, r);
+    actions.onReject(order, r);
     setArming(false);
     setReason("");
   }
@@ -116,23 +121,22 @@ function OrderRow({ order }: { order: Order }) {
   return (
     <div data-orderrow className="rounded-[18px] border border-border bg-card-2 p-5">
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-display text-[15px] font-bold text-text">{order.ref}</span>
-              <span className="text-[12px] text-muted-2">· {order.when}</span>
-            </div>
-            <p className="mt-0.5 text-[14px] text-text-3">
-              {order.name} · {order.phone}
-            </p>
-            <p className="mt-1 text-[13px] text-muted" data-orderitem>
-              {order.items}
-            </p>
-            <p className="mt-0.5 text-[12px] text-muted-2">{order.provider}</p>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="font-display text-[15px] font-bold text-text">{order.name}</span>
+            <span className={cn("rounded-full border px-2.5 py-0.5 text-[11px] font-semibold", meta.cls)}>
+              {meta.label}
+            </span>
+            <span className="text-[12px] text-muted-2">
+              {order.ref} · {order.when}
+            </span>
           </div>
-          <span className={cn("shrink-0 rounded-full border px-3 py-1 text-[12px] font-semibold", meta.cls)}>
-            {meta.label}
-          </span>
+          <p className="mt-1.5 text-[14px] text-text-3">
+            {order.phone} · {order.provider}
+          </p>
+          <p className="mt-1 text-[13px] text-muted" data-orderitem>
+            {order.items}
+          </p>
         </div>
 
         <div
@@ -162,7 +166,7 @@ function OrderRow({ order }: { order: Order }) {
                 shape="pill"
                 size="sm"
                 className="flex-[1.5_1_0] min-w-0 px-1.5"
-                onClick={() => remind(order.ref)}
+                onClick={() => actions.onRemind(order)}
               >
                 <BellRing className="h-4 w-4" /> Send reminder
               </Button>
@@ -170,7 +174,7 @@ function OrderRow({ order }: { order: Order }) {
                 shape="pill"
                 size="sm"
                 className="flex-1 min-w-0 px-1.5"
-                onClick={() => confirm(order.ref)}
+                onClick={() => actions.onConfirm(order)}
               >
                 <Check className="h-4 w-4" />
                 <span data-lbl-full className="max-[560px]:hidden">Confirm &amp; send SMS</span>
@@ -240,21 +244,79 @@ function OrderRow({ order }: { order: Order }) {
 
 export function AdminView() {
   const { authed, lock } = useAdmin();
-  const { orders, pendingCount } = useOrders();
+  const demo = useOrders();
   const [filter, setFilter] = useState<Filter>("pending");
+  // null = using the local demo store; array = server-backed (Supabase on).
+  const [serverOrders, setServerOrders] = useState<Order[] | null>(null);
+
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/orders");
+      const data = await res.json();
+      setServerOrders(data?.configured ? (data.orders ?? []) : null);
+    } catch {
+      setServerOrders(null); // network/offline — keep the demo store
+    }
+  }, []);
+
+  useEffect(() => {
+    // load() only setState()s after `await fetch`, so this is not a synchronous
+    // cascading render — matching the localStorage hydration in admin-context.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (authed) void load();
+  }, [authed, load]);
+
+  const serverBacked = serverOrders !== null;
+  const orders = serverBacked ? serverOrders : demo.orders;
+
+  // Server-backed actions hit the API by row id, then refresh; the demo store
+  // mutates client state in place. Same buttons, two backends.
+  const actions: RowActions = serverBacked
+    ? {
+        onConfirm: (o) => {
+          if (!o.id) return;
+          void fetch(`/api/admin/orders/${o.id}/confirm`, { method: "POST" }).then(load);
+        },
+        onRemind: (o) => {
+          if (o.id) void fetch(`/api/admin/orders/${o.id}/remind`, { method: "POST" });
+        },
+        onReject: (o, reason) => {
+          if (!o.id) return;
+          void fetch(`/api/admin/orders/${o.id}/reject`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reason }),
+          }).then(load);
+        },
+      }
+    : {
+        onConfirm: (o) => demo.confirm(o.ref),
+        onRemind: (o) => demo.remind(o.ref),
+        onReject: (o, reason) => demo.reject(o.ref, reason),
+      };
+
+  const pendingCount = orders.filter(
+    (o) => o.status === "pending" || o.status === "reminded",
+  ).length;
+  const visible = orders.filter((o) => matchesFilter(o, filter));
 
   if (!authed) return <PinGate />;
-
-  const visible = orders.filter((o) => matchesFilter(o, filter));
 
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-[clamp(26px,4vw,36px)] font-extrabold tracking-[-0.5px] text-text">
-            Order console
+          <span className="text-[13px] font-bold uppercase tracking-[0.18em] text-pink-hover">
+            Team only
+          </span>
+          <h1 className="mt-2 font-display text-[clamp(30px,5vw,44px)] font-extrabold leading-[1.05] tracking-[-0.5px] text-text">
+            Ticket orders
           </h1>
-          <p className="mt-1 text-[14px] text-muted">
+          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-muted">
+            Check each order against the Mobile Money message on your phone, then
+            confirm. Confirming sends the buyer their ticket SMS automatically.
+          </p>
+          <p className="mt-3 text-[14px] font-semibold text-pink-hover">
             {pendingCount} awaiting confirmation
           </p>
         </div>
@@ -262,6 +324,13 @@ export function AdminView() {
           <Lock className="h-4 w-4" /> Lock
         </Button>
       </div>
+
+      {!serverBacked && (
+        <p className="mt-6 rounded-[16px] border border-[var(--warn-border)] bg-[var(--warn-bg)] px-5 py-4 text-[13.5px] leading-relaxed text-warn">
+          Sample orders below are demo data — connect Supabase to receive real
+          ticket orders here.
+        </p>
+      )}
 
       <div className="mt-6 flex flex-wrap gap-2">
         {FILTERS.map((f) => (
@@ -277,7 +346,7 @@ export function AdminView() {
             No orders in this view.
           </p>
         ) : (
-          visible.map((o) => <OrderRow key={o.ref} order={o} />)
+          visible.map((o) => <OrderRow key={o.id ?? o.ref} order={o} actions={actions} />)
         )}
       </div>
     </>

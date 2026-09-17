@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { makeRef, toE164, itemsSummary, type CheckoutItem } from "@/lib/order";
+import { notifyAdminNewOrder } from "@/lib/notify";
 
 interface Body {
   name: string;
@@ -36,6 +37,19 @@ export async function POST(req: Request) {
   const ref = makeRef();
   const amount = items.reduce((n, i) => n + i.unitPrice * i.qty, 0);
   const phone = toE164(body.phone ?? "");
+  const summary = itemsSummary(items);
+
+  // Ping the team's phone the moment an order is submitted — the primary
+  // notification channel today, and independent of the database. Best-effort:
+  // an SMS failure must never break order creation.
+  await notifyAdminNewOrder({
+    ref,
+    name,
+    phone,
+    provider: body.provider ?? "",
+    amount,
+    itemsSummary: summary,
+  }).catch(() => {});
 
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ ref, orderId: null, amount, stub: true });
@@ -54,7 +68,7 @@ export async function POST(req: Request) {
       customer_phone: phone,
       provider: providerEnum(body.provider),
       amount,
-      items_summary: itemsSummary(items),
+      items_summary: summary,
       status: "pending",
     })
     .select("id")
