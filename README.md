@@ -65,17 +65,41 @@ Until the env vars are present, the app runs in **prototype mode**: checkout and
 the admin console work against the in-memory client store, and API routes return
 stubbed success — no network, no database.
 
+## SMS setup (Africa's Talking)
+
+The buyer's ticket SMS (sent on **Confirm**) and the admin new-order alert go
+through the provider-agnostic seam in `src/lib/sms.ts`, wired for Africa's Talking.
+
+1. Create an account at [africastalking.com](https://africastalking.com) and copy
+   your **API key**.
+2. Put the values in `.env.local`:
+   - `SMS_PROVIDER=africastalking`
+   - `SMS_API_KEY=…`
+   - `AT_USERNAME=sandbox` — test free in the AT simulator, or your live app
+     username for production.
+   - `SMS_SENDER_ID=…` — your approved sender ID (apply early; approval takes days).
+   - `ADMIN_SMS_RECIPIENTS=+2567…,…` — team number(s) for the new-order alert.
+3. Launch the **AT simulator** with a sandbox number to watch messages arrive at
+   zero cost. Flip `AT_USERNAME` to your live username to go real.
+
+With no SMS vars set, `sendSms()` just logs — the flow still works end to end.
+
 ## Backend status (see `docs/` design contract)
 
 Everything payment- and SMS-related is currently **faked / stubbed** and ready to
 wire up:
 
-- `POST /api/orders` — creates an order (persists to Supabase when configured).
-- `POST /api/webhooks/mtn` · `POST /api/webhooks/airtel` — signature verification,
-  idempotency, mark-paid, ticket issuance and SMS are TODO.
-- `POST /api/admin/orders/[id]/confirm` · `/remind` — admin actions; **auth is a
-  prototype PIN** (`AdminProvider`) and must be replaced with Supabase Auth +
-  server-side role checks before launch.
+- `POST /api/orders` — creates an order (persists to Supabase when configured) and
+  texts the team (`ADMIN_SMS_RECIPIENTS`) best-effort.
+- `GET /api/admin/orders` — team order list when Supabase is on; else the panel
+  uses its demo store.
+- `POST /api/admin/orders/[id]/confirm` — issues ticket code(s) and sends the buyer
+  their ticket SMS on the pending→confirmed transition (idempotent). `/reject`
+  declines with a reason; `/remind` re-nudges. **Auth is a prototype PIN**
+  (`AdminProvider`) and must be replaced with real accounts before launch.
+- `POST /api/webhooks/mtn` · `POST /api/webhooks/airtel` — automated MoMo
+  collections (§11): signature verification, idempotency and mark-paid are TODO;
+  the manual Confirm flow above is the current path and stays as the fallback.
 
 ### Before going live
 - [ ] Mobile Money merchant/aggregator account live (Flutterwave / Pesapal / Xente,
