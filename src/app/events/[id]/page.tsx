@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, Clock, MapPin, Check, Phone } from "lucide-react";
+import { ArrowLeft, Star } from "lucide-react";
 import { EVENTS, getEvent } from "@/data/events";
 import { EventTiers } from "@/components/events/event-tiers";
 
@@ -43,10 +43,7 @@ export default async function EventDetailPage({
         <ArrowLeft className="h-4 w-4" /> All events
       </Link>
 
-      <div
-        data-detgrid
-        className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,420px)_1fr]"
-      >
+      <div data-detgrid className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,420px)_1fr]">
         {/* Poster */}
         <div data-postercol className="lg:h-full">
           <div
@@ -67,14 +64,10 @@ export default async function EventDetailPage({
         {/* Content */}
         <div className="flex flex-col gap-10">
           <header>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-accent-grad px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-                {event.tag}
-              </span>
-              <span className="rounded-full border border-border bg-chip px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-pink-hover">
-                {event.priceLabel}
-              </span>
-            </div>
+            <span className="inline-flex items-center rounded-full border border-[rgba(255,45,149,.4)] bg-[rgba(255,45,149,.1)] px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-pink-hover">
+              {event.edition ? `${event.edition} · ` : ""}
+              {event.tag}
+            </span>
             <h1 className="mt-4 font-display text-[clamp(30px,4.6vw,48px)] font-extrabold leading-[1.05] tracking-[-0.8px] text-text">
               {event.title}
             </h1>
@@ -82,12 +75,12 @@ export default async function EventDetailPage({
           </header>
 
           {/* Theme */}
-          <div className="rounded-[20px] border border-[rgba(255,45,149,.3)] bg-[linear-gradient(135deg,rgba(255,45,149,.1),rgba(139,47,214,.08))] p-6">
+          <div className="rounded-[20px] border border-[rgba(139,47,214,.3)] bg-[linear-gradient(135deg,rgba(139,47,214,.14),rgba(255,45,149,.06))] p-6">
             <span className="text-[12px] font-bold uppercase tracking-[0.16em] text-pink-hover">
               Theme
             </span>
             <p className="mt-2 font-display text-[22px] font-extrabold leading-tight text-text">
-              “{event.theme}”
+              {event.theme}
             </p>
             <p className="mt-1 text-[14px] italic text-muted">{event.themeSub}</p>
           </div>
@@ -95,63 +88,54 @@ export default async function EventDetailPage({
           {/* Facts */}
           <div data-detfacts className="grid gap-4 sm:grid-cols-3">
             {[
-              { icon: CalendarDays, label: "Date", value: event.dateFull },
-              { icon: Clock, label: "Time", value: event.time },
-              { icon: MapPin, label: "Venue", value: event.place },
+              { label: "Date", value: event.dateFull },
+              { label: "Time", value: event.time },
+              { label: "Venue", value: event.place },
             ].map((f) => (
               <div key={f.label} className="rounded-[16px] border border-border bg-card-2 p-4">
-                <f.icon className="h-5 w-5 text-pink" />
-                <div className="mt-2 text-[12px] uppercase tracking-wide text-muted-2">
+                <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-2">
                   {f.label}
                 </div>
-                <div className="mt-0.5 text-[14px] font-semibold text-text">{f.value}</div>
+                <div className="mt-1.5 text-[15px] font-bold text-text">{f.value}</div>
               </div>
             ))}
           </div>
 
           <p className="text-[16px] leading-relaxed text-muted">{event.blurb}</p>
 
-          {/* Speakers */}
+          {/* What you'll get */}
           <div>
-            <h2 className="font-display text-[22px] font-extrabold text-text">Speakers</h2>
-            <div data-detspk className="mt-5 grid gap-4 sm:grid-cols-2">
-              {event.speakers.map((s) => (
-                <div
-                  key={s.name}
-                  className="flex items-center gap-4 rounded-[16px] border border-border bg-card-2 p-4"
-                >
-                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-accent-grad font-display text-[17px] font-bold text-white">
-                    {s.name.split(" ").filter(Boolean).slice(-1)[0]?.[0] ?? s.name[0]}
-                  </span>
-                  <div className="min-w-0">
-                    <div className="font-display text-[15px] font-bold leading-tight text-text">
-                      {s.name}
-                    </div>
-                    <div className="mt-0.5 text-[13px] text-muted">{s.role}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Highlights */}
-          <div>
-            <h2 className="font-display text-[22px] font-extrabold text-text">Highlights</h2>
-            <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+            <h2 className="font-display text-[22px] font-extrabold text-text">What you&apos;ll get</h2>
+            <ul className="mt-5 flex flex-col gap-3">
               {event.highlights.map((h) => (
-                <li key={h} className="flex items-start gap-2.5 text-[15px] text-text-3">
-                  <Check className="mt-0.5 h-5 w-5 shrink-0 text-pink" />
+                <li key={h} className="flex items-center gap-3 text-[15px] text-text-3">
+                  <Star className="h-[16px] w-[16px] shrink-0 fill-[var(--pink)] text-pink" />
                   <span>{h}</span>
                 </li>
               ))}
             </ul>
           </div>
 
+          {/* Speakers */}
+          <div>
+            <h2 className="font-display text-[22px] font-extrabold text-text">Speakers</h2>
+            <div data-detspk className="mt-5 grid gap-4 sm:grid-cols-2">
+              {event.speakers.map((s) => (
+                <div key={s.name} className="rounded-[16px] border border-border bg-card-2 p-5">
+                  <div className="font-display text-[16px] font-bold leading-tight text-text">
+                    {s.name}
+                  </div>
+                  <div className="mt-1.5 text-[13.5px] leading-relaxed text-muted">{s.role}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Tickets */}
           <div id="tickets">
-            <h2 className="font-display text-[22px] font-extrabold text-text">Ticket tiers</h2>
+            <h2 className="font-display text-[22px] font-extrabold text-text">Tickets on sale</h2>
             <p className="mt-1 text-[14px] text-muted">
-              All prices in UGX. Payment is by Mobile Money at checkout.
+              Pick your tier, then pay securely with MTN or Airtel Mobile Money at checkout.
             </p>
             <div className="mt-5">
               <EventTiers event={event} />
@@ -159,15 +143,9 @@ export default async function EventDetailPage({
           </div>
 
           {/* Enquiries */}
-          <div className="flex flex-wrap items-center gap-3 rounded-[16px] border border-border bg-card p-5">
-            <Phone className="h-5 w-5 text-pink" />
-            <span className="text-[14px] font-semibold text-text-3">Enquiries:</span>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-[14px] text-muted">
-              {event.enquiries.map((n) => (
-                <span key={n}>{n}</span>
-              ))}
-            </div>
-          </div>
+          <p className="text-center text-[13.5px] text-muted-2">
+            Ticket enquiries: {event.enquiries.join(" · ")}
+          </p>
         </div>
       </div>
     </div>

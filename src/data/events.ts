@@ -7,6 +7,7 @@ export const EVENTS: EventItem[] = [
     mon: "OCT",
     monthFull: "October 2026",
     tag: "IN PERSON",
+    edition: "Third Edition",
     title: "Kingdom Business Summit 2026",
     subtitle: "Third Edition · with Pastor Joseph Prosper Tumusiime",
     theme: "Not Just Priests — We are Kings Too",

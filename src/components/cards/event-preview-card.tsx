@@ -37,7 +37,7 @@ export function EventPreviewCard({ event }: { event: EventItem }) {
             {event.priceLabel}
           </span>
           <Button asChild shape="pill" size="sm">
-            <Link href={`/events/${event.id}`}>Get tickets</Link>
+            <Link href="/events">Get tickets</Link>
           </Button>
         </div>
       </div>

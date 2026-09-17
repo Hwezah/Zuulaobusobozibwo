@@ -1,15 +1,9 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
 import { MapPin, Clock } from "lucide-react";
 import type { EventItem } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { TicketDialog } from "./ticket-dialog";
 
 export function EventRow({ event }: { event: EventItem }) {
-  const [open, setOpen] = useState(false);
-
   return (
     <div
       data-eventrow
@@ -52,12 +46,10 @@ export function EventRow({ event }: { event: EventItem }) {
         <Button asChild variant="subtle" shape="pill" className="flex-1 sm:flex-none">
           <Link href={`/events/${event.id}`}>Details</Link>
         </Button>
-        <Button shape="pill" className="flex-1 sm:flex-none" onClick={() => setOpen(true)}>
-          Get tickets
+        <Button asChild shape="pill" className="flex-1 sm:flex-none">
+          <Link href={`/events/${event.id}`}>Get tickets</Link>
         </Button>
       </div>
-
-      <TicketDialog event={event} open={open} onOpenChange={setOpen} />
     </div>
   );
 }

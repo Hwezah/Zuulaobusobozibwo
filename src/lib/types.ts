@@ -37,6 +37,7 @@ export interface EventItem {
   mon: string;
   monthFull: string;
   tag: string;
+  edition?: string;
   title: string;
   subtitle: string;
   theme: string;
