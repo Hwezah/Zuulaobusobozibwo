@@ -78,7 +78,7 @@ export interface Article {
   close: string;
 }
 
-export type OrderStatus = "pending" | "reminded" | "confirmed";
+export type OrderStatus = "pending" | "reminded" | "confirmed" | "failed";
 
 export interface Order {
   ref: string;
@@ -90,4 +90,6 @@ export interface Order {
   items: string;
   when: string;
   status: OrderStatus;
+  /** reason captured when an admin declines the order (status "failed") */
+  reason?: string;
 }

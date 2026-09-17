@@ -25,10 +25,13 @@ create table if not exists orders (
   status          order_status not null default 'pending',
   provider_txn_id text,
   proof_url       text,
+  reject_reason   text,                                -- set when an admin declines
   sms_sent_at     timestamptz,
   created_at      timestamptz not null default now(),
   updated_at      timestamptz not null default now()
 );
+-- Idempotent for databases created before reject_reason was added.
+alter table orders add column if not exists reject_reason text;
 create index if not exists orders_status_idx on orders (status);
 create index if not exists orders_created_idx on orders (created_at desc);
 

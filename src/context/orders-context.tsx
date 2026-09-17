@@ -8,6 +8,7 @@ interface OrdersCtx {
   addOrder: (o: Order) => void;
   confirm: (ref: string) => void;
   remind: (ref: string) => void;
+  reject: (ref: string, reason?: string) => void;
   pendingCount: number;
 }
 
@@ -41,10 +42,26 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
-  const pendingCount = orders.filter((o) => o.status !== "confirmed").length;
+  // Confirmed orders never leave that state; a declined order is resolved, not
+  // pending — so both are excluded from the "awaiting confirmation" count.
+  const reject = useCallback(
+    (ref: string, reason?: string) =>
+      setOrders((s) =>
+        s.map((o) =>
+          o.ref === ref && o.status !== "confirmed"
+            ? { ...o, status: "failed", reason }
+            : o,
+        ),
+      ),
+    [],
+  );
+
+  const pendingCount = orders.filter(
+    (o) => o.status === "pending" || o.status === "reminded",
+  ).length;
 
   return (
-    <Ctx.Provider value={{ orders, addOrder, confirm, remind, pendingCount }}>
+    <Ctx.Provider value={{ orders, addOrder, confirm, remind, reject, pendingCount }}>
       {children}
     </Ctx.Provider>
   );

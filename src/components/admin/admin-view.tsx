@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Lock, LockKeyhole, Check, BellRing, ShieldAlert } from "lucide-react";
+import { Lock, LockKeyhole, Check, BellRing, ShieldAlert, X, Ban } from "lucide-react";
 import { useAdmin } from "@/context/admin-context";
 import { useOrders } from "@/context/orders-context";
+import { Chip } from "@/components/common";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Order } from "@/lib/types";
@@ -13,10 +14,34 @@ function statusMeta(status: Order["status"]) {
   switch (status) {
     case "confirmed":
       return { label: "Confirmed", cls: "border-[var(--ok-border)] bg-[var(--ok-bg)] text-ok" };
+    case "failed":
+      return { label: "Declined", cls: "border-[rgba(255,90,90,.4)] bg-[rgba(255,90,90,.12)] text-[#ff8a8a]" };
     case "reminded":
       return { label: "Reminder sent", cls: "border-[var(--warn-border)] bg-[var(--warn-bg)] text-warn" };
     default:
       return { label: "Pending", cls: "border-[rgba(255,45,149,.35)] bg-[rgba(255,45,149,.14)] text-pink-hover" };
+  }
+}
+
+type Filter = "pending" | "confirmed" | "failed" | "all";
+
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: "pending", label: "Pending" },
+  { key: "confirmed", label: "Confirmed" },
+  { key: "failed", label: "Declined" },
+  { key: "all", label: "All" },
+];
+
+function matchesFilter(order: Order, filter: Filter): boolean {
+  switch (filter) {
+    case "pending":
+      return order.status === "pending" || order.status === "reminded";
+    case "confirmed":
+      return order.status === "confirmed";
+    case "failed":
+      return order.status === "failed";
+    default:
+      return true;
   }
 }
 
@@ -72,9 +97,21 @@ function PinGate() {
 }
 
 function OrderRow({ order }: { order: Order }) {
-  const { confirm, remind } = useOrders();
+  const { confirm, remind, reject } = useOrders();
+  const [arming, setArming] = useState(false);
+  const [reason, setReason] = useState("");
   const meta = statusMeta(order.status);
   const isConfirmed = order.status === "confirmed";
+  const isFailed = order.status === "failed";
+  const actionable = !isConfirmed && !isFailed;
+
+  function decline() {
+    const r = reason.trim();
+    if (!r) return;
+    reject(order.ref, r);
+    setArming(false);
+    setReason("");
+  }
 
   return (
     <div data-orderrow className="rounded-[18px] border border-border bg-card-2 p-5">
@@ -111,9 +148,14 @@ function OrderRow({ order }: { order: Order }) {
                 <Check className="h-3.5 w-3.5" /> Ticket SMS sent
               </span>
             )}
+            {isFailed && (
+              <span className="inline-flex items-center gap-1 text-[12px] text-[#ff8a8a] max-[820px]:hidden">
+                <Ban className="h-3.5 w-3.5" /> Order declined
+              </span>
+            )}
           </div>
 
-          {!isConfirmed && (
+          {actionable && (
             <div data-ordbtns className="flex min-w-0 flex-[1_1_0] items-center gap-2">
               <Button
                 variant="ghost"
@@ -137,6 +179,60 @@ function OrderRow({ order }: { order: Order }) {
             </div>
           )}
         </div>
+
+        {/* Decline lives on its own line so the protected [data-ordact] row
+            stays one line, price-left / buttons-right, at every breakpoint. */}
+        {actionable &&
+          (arming ? (
+            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border pt-3">
+              <Input
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Reason (e.g. no payment received)"
+                className="h-9 min-w-0 flex-1 text-[13px]"
+                autoFocus
+                onKeyDown={(e) => e.key === "Enter" && decline()}
+              />
+              <Button
+                shape="pill"
+                size="sm"
+                variant="ghost"
+                className="shrink-0 text-[#ff8a8a] hover:text-[#ff8a8a]"
+                onClick={decline}
+                disabled={!reason.trim()}
+              >
+                <Ban className="h-4 w-4" /> Confirm decline
+              </Button>
+              <Button
+                shape="pill"
+                size="sm"
+                variant="subtle"
+                className="shrink-0"
+                onClick={() => {
+                  setArming(false);
+                  setReason("");
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          ) : (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setArming(true)}
+                className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-muted-2 transition-colors hover:text-[#ff8a8a]"
+              >
+                <X className="h-3.5 w-3.5" /> Decline order
+              </button>
+            </div>
+          ))}
+
+        {isFailed && order.reason && (
+          <p className="border-t border-border pt-3 text-[12.5px] text-muted-2">
+            <span className="font-semibold text-text-3">Declined:</span> {order.reason}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -145,8 +241,11 @@ function OrderRow({ order }: { order: Order }) {
 export function AdminView() {
   const { authed, lock } = useAdmin();
   const { orders, pendingCount } = useOrders();
+  const [filter, setFilter] = useState<Filter>("pending");
 
   if (!authed) return <PinGate />;
+
+  const visible = orders.filter((o) => matchesFilter(o, filter));
 
   return (
     <>
@@ -164,10 +263,22 @@ export function AdminView() {
         </Button>
       </div>
 
-      <div className="mt-8 flex flex-col gap-4">
-        {orders.map((o) => (
-          <OrderRow key={o.ref} order={o} />
+      <div className="mt-6 flex flex-wrap gap-2">
+        {FILTERS.map((f) => (
+          <Chip key={f.key} active={filter === f.key} onClick={() => setFilter(f.key)}>
+            {f.label}
+          </Chip>
         ))}
+      </div>
+
+      <div className="mt-8 flex flex-col gap-4">
+        {visible.length === 0 ? (
+          <p className="rounded-[18px] border border-border bg-card-2 p-8 text-center text-[14px] text-muted">
+            No orders in this view.
+          </p>
+        ) : (
+          visible.map((o) => <OrderRow key={o.ref} order={o} />)
+        )}
       </div>
     </>
   );
