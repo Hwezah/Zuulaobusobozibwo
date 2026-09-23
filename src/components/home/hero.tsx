@@ -116,24 +116,33 @@ export function Hero() {
             </div>
           </div>
 
-          {/* right: portrait — cutout, no frame, standing on the page background */}
-          <div className="relative aspect-[4/5] w-full">
+          {/* right: portrait — cutout on the gradient, right-anchored, base fades out */}
+          <div className="relative">
+            {/* soft magenta glow sitting behind him */}
             <div
-              className="absolute inset-0"
+              aria-hidden
+              className="hide-in-light pointer-events-none absolute left-1/2 top-[42%] h-[32rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(255,45,149,.20), rgba(139,47,214,.16) 46%, transparent 72%)",
+              }}
+            />
+            <div
+              className="relative mx-auto aspect-[4/5] w-full max-w-[560px] lg:mx-0 lg:ml-auto lg:max-w-[600px]"
               style={{ animation: "floaty 6s ease-in-out infinite" }}
             >
               <CutoutImage
                 src="/assets/ceo-cutout-full.png"
                 alt="Tumusiime Joseph Prosper"
-                className="absolute bottom-0 left-0 h-full w-full object-contain"
+                className="absolute bottom-0 right-0 h-full w-full object-contain"
                 style={{
-                  objectPosition: "center bottom",
-                  WebkitMaskImage: "linear-gradient(to top, transparent 0%, #000 30%)",
-                  maskImage: "linear-gradient(to top, transparent 0%, #000 30%)",
+                  objectPosition: "right bottom",
+                  WebkitMaskImage: "linear-gradient(to top, transparent 0%, #000 28%)",
+                  maskImage: "linear-gradient(to top, transparent 0%, #000 28%)",
                 }}
               />
             </div>
-            <div className="absolute bottom-4 left-4 rounded-[14px] border border-border-2 bg-panel/90 px-4 py-3 backdrop-blur">
+            <div className="absolute bottom-4 left-2 z-10 rounded-[14px] border border-border-2 bg-panel/90 px-4 py-3 backdrop-blur sm:left-4">
               <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-pink-hover">
                 Next live event
               </div>
