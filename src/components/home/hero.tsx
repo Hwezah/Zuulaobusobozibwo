@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ImageWell } from "@/components/image-well";
+import { CutoutImage } from "@/components/cutout-image";
 import { ROT_WORDS, STATS, HERO, TOPIC_STRIP } from "@/data/site";
 
 function useTyping(words: string[]) {
@@ -116,13 +116,23 @@ export function Hero() {
             </div>
           </div>
 
-          {/* right: portrait */}
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[24px] border border-border shadow-[0_24px_70px_rgba(60,30,80,.25)]">
-            <ImageWell
-              src="/assets/joseph-portrait.jpg"
-              label={HERO.portraitLabel}
-              className="absolute inset-0 h-full w-full"
-            />
+          {/* right: portrait — cutout, no frame, standing on the page background */}
+          <div className="relative aspect-[4/5] w-full">
+            <div
+              className="absolute inset-0"
+              style={{ animation: "floaty 6s ease-in-out infinite" }}
+            >
+              <CutoutImage
+                src="/assets/ceo-cutout-full.png"
+                alt="Tumusiime Joseph Prosper"
+                className="absolute bottom-0 left-0 h-full w-full object-contain"
+                style={{
+                  objectPosition: "center bottom",
+                  WebkitMaskImage: "linear-gradient(to top, transparent 0%, #000 30%)",
+                  maskImage: "linear-gradient(to top, transparent 0%, #000 30%)",
+                }}
+              />
+            </div>
             <div className="absolute bottom-4 left-4 rounded-[14px] border border-border-2 bg-panel/90 px-4 py-3 backdrop-blur">
               <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-pink-hover">
                 Next live event
