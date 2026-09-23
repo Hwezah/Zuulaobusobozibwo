@@ -87,7 +87,7 @@ export function TelegramCommunity() {
               className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-accent-grad px-4 py-2 text-[13px] font-bold text-white"
             >
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copied ? "Copied" : "Copy invite link"}
+              {copied ? "Invite link copied" : "Copy invite link"}
             </button>
           </div>
 

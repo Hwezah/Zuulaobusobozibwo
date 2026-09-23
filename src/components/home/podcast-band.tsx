@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PiWaveform } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
+import { SOCIALS } from "@/config/links";
 import { PODCAST_BAND } from "@/data/site";
 
 export function PodcastBand() {
@@ -15,9 +15,9 @@ export function PodcastBand() {
         <p className="mt-1 text-[14px] leading-relaxed text-muted">{PODCAST_BAND.desc}</p>
       </div>
       <Button asChild variant="ghost" shape="pill" className="max-sm:w-full">
-        <Link href="/podcast">
+        <a href={SOCIALS.youtube} target="_blank" rel="noopener noreferrer">
           {PODCAST_BAND.cta} <ArrowRight className="h-4 w-4" />
-        </Link>
+        </a>
       </Button>
     </div>
   );

@@ -81,6 +81,7 @@ export function SiteFooter() {
               href={s.href}
               target="_blank"
               rel="noopener noreferrer"
+              title={s.handle}
               className="flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-chip px-6 py-2.5 text-[12.5px] font-semibold text-text-3 transition-colors hover:border-border-strong hover:text-text sm:flex-none"
             >
               {s.label}

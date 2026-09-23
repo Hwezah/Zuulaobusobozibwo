@@ -44,7 +44,7 @@ export const EVENTS: EventItem[] = [
       "Kingdom teaching on Revelation 1:6",
       "Networking with Kingdom entrepreneurs",
     ],
-    enquiries: ["0757 217 681", "0744 929 345", "0777 667 080"],
+    enquiries: ["0777 667 080", "0757 217 681"],
     tiers: [
       {
         pid: "t-kbs-ord",

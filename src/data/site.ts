@@ -1,8 +1,12 @@
 import type { IconKey } from "./icons";
+import { LINKS, SOCIALS } from "@/config/links";
+
+/** Re-exported so existing `@/data/site` imports keep working. */
+export { LINKS, SOCIALS };
 
 export const CONTACTS = {
-  enquiries: ["0757 217 681", "0744 929 345", "0777 667 080"],
-  whatsapp: "0753 844 033",
+  enquiries: ["0777 667 080", "0757 217 681"],
+  whatsapp: "0777 667 080",
   email: "hello@zuulaobusobozibwo.org",
   location: "Kampala, Uganda",
 };
@@ -14,22 +18,16 @@ export const PAY = {
 } as const;
 
 export const TELEGRAM = {
-  url: "https://t.me/ZuulaMentorship",
-  handle: "@ZuulaMentorship",
-};
-
-export const SOCIALS = {
-  tiktok: "https://www.tiktok.com/@zuulaobusobozibwo",
-  whatsapp: "https://wa.me/256753844033",
-  facebook: "https://facebook.com/ZuulaObusobozibwo",
-  telegram: "https://t.me/ZuulaMentorship",
+  url: LINKS.telegramGroup,
+  handle: "Inner Circle group",
 };
 
 export const SOCIAL_LINKS: { label: string; handle: string; href: string }[] = [
   { label: "TikTok", handle: "@zuulaobusobozibwo", href: SOCIALS.tiktok },
-  { label: "WhatsApp", handle: "0753 844 033", href: SOCIALS.whatsapp },
+  { label: "WhatsApp", handle: "0777 667 080", href: SOCIALS.whatsapp },
   { label: "Facebook", handle: "Zuula Obusobozibwo", href: SOCIALS.facebook },
-  { label: "Telegram", handle: "@ZuulaMentorship", href: SOCIALS.telegram },
+  { label: "Telegram", handle: "Inner Circle group", href: SOCIALS.telegram },
+  { label: "YouTube", handle: "Zuula Weekly Podcast", href: SOCIALS.youtube },
 ];
 
 export interface IconCard {
@@ -76,11 +74,49 @@ export interface PriceTier {
   badge?: string;
 }
 
-/** Home page membership teaser tiers. */
-export const MEMBERSHIP_TIERS: PriceTier[] = [
-  { name: "Seeker", price: "Free", per: "", featured: false, feats: ["Weekly newsletter", "Free article library", "Community forum access", "1 sample eBook"], btn: "Get started" },
-  { name: "Inner Circle", price: "UGX 25K", per: "/mo", featured: true, feats: ["Everything in Seeker", "Full course library", "Monthly group coaching", "Members-only events", "All eBooks & audio"], btn: "Join Inner Circle" },
-  { name: "Legacy", price: "UGX 60K", per: "/mo", featured: false, feats: ["Everything in Inner Circle", "Quarterly 1:1 with Joseph", "Priority event tickets", "Exclusive masterminds"], btn: "Go Legacy" },
+/** Approx. USD→UGX conversion for the membership currency toggle. */
+export const USD_UGX = 3700; // TODO: confirm the rate with the client
+
+export interface MembershipTier {
+  name: string;
+  /** null = Free. Otherwise the monthly USD price the toggle converts. */
+  priceUsd: number | null;
+  per?: string;
+  featured?: boolean;
+  badge?: string;
+  feats: string[];
+  btn: string;
+  /** Which action the button performs. */
+  action: "whatsappGroup" | "telegramGroup" | "mentorship";
+}
+
+/** Home page membership tiers (3 equal cards, middle one featured). */
+export const MEMBERSHIP_TIERS: MembershipTier[] = [
+  {
+    name: "Free Community",
+    priceUsd: null,
+    feats: ["WhatsApp community group", "Weekly encouragement", "Free article library", "Event announcements"],
+    btn: "Join on WhatsApp",
+    action: "whatsappGroup",
+  },
+  {
+    name: "Inner Circle",
+    priceUsd: 25,
+    per: "/month",
+    featured: true,
+    badge: "Most popular",
+    feats: ["Private Telegram community", "Monthly group coaching", "Members-only events", "Live Q&A with Joseph"],
+    btn: "Join on Telegram",
+    action: "telegramGroup",
+  },
+  {
+    name: "One-on-One Mentorship & Guidance",
+    priceUsd: 50,
+    per: "/month",
+    feats: ["Personal sessions with Joseph", "Tailored guidance plan", "Direct accountability", "Priority event tickets"],
+    btn: "Start mentorship",
+    action: "mentorship",
+  },
 ];
 
 /** Mentorship page packages. */
@@ -148,10 +184,10 @@ export const ABOUT_STATS = [
 ];
 
 export const CONTACT_METHODS: IconCard[] = [
-  { ico: "phone", title: "Call or WhatsApp", desc: "0753 844 033 · 0757 217 681", href: SOCIALS.whatsapp },
+  { ico: "phone", title: "Call or WhatsApp", desc: "0777 667 080 · 0757 217 681", href: SOCIALS.whatsapp },
   { ico: "mail", title: "Email us", desc: "hello@zuulaobusobozibwo.org", href: "mailto:hello@zuulaobusobozibwo.org" },
   { ico: "pin", title: "Visit", desc: "Kampala, Uganda" },
-  { ico: "send", title: "Telegram community", desc: "@ZuulaMentorship", href: SOCIALS.telegram },
+  { ico: "send", title: "Telegram community", desc: "Inner Circle group", href: SOCIALS.telegram },
 ];
 
 export const BOOKING_TYPES: IconCard[] = [
@@ -299,6 +335,6 @@ export const AUTHOR = {
 export const FOOTER = {
   blurb:
     "Transform your life through deeply practical, biblically grounded insights designed to awaken your purpose, heal your inner world, and activate your full potential.",
-  phones: ["0753 844 033", "0757 217 681"],
+  phones: ["0777 667 080", "0757 217 681"],
   developer: { name: "Hwezah", phone: "0742 696 385" },
 };

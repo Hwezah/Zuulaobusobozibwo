@@ -77,13 +77,13 @@ export default function PodcastPage() {
           </p>
           <div className="mt-2 flex flex-wrap justify-center gap-3">
             <Button asChild shape="pill" size="lg">
-              <a href={SOCIALS.tiktok} target="_blank" rel="noopener noreferrer">
-                Watch on TikTok
+              <a href={SOCIALS.youtube} target="_blank" rel="noopener noreferrer">
+                Watch on YouTube
               </a>
             </Button>
             <Button asChild variant="ghost" shape="pill" size="lg">
-              <a href={SOCIALS.facebook} target="_blank" rel="noopener noreferrer">
-                Follow on Facebook
+              <a href={SOCIALS.tiktok} target="_blank" rel="noopener noreferrer">
+                Follow on TikTok
               </a>
             </Button>
           </div>

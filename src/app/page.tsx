@@ -10,11 +10,11 @@ import { Scroller } from "@/components/scroller";
 import { BookCard } from "@/components/cards/book-card";
 import { EventPreviewCard } from "@/components/cards/event-preview-card";
 import { IconFeatureCard } from "@/components/cards/icon-card";
-import { TierCard } from "@/components/cards/tier-card";
+import { MembershipTiers } from "@/components/home/membership-tiers";
 import { TestimonialCard } from "@/components/cards/testimonial-card";
 import { EVENTS } from "@/data/events";
 import { BOOKS } from "@/data/products";
-import { SERVICES, MEMBERSHIP_TIERS, TESTIMONIALS } from "@/data/site";
+import { SERVICES, TESTIMONIALS } from "@/data/site";
 
 export default function HomePage() {
   return (
@@ -94,11 +94,7 @@ export default function HomePage() {
       {/* Membership */}
       <Section className="pt-0">
         <SectionHeading eyebrow="Community" title="Join the membership" />
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {MEMBERSHIP_TIERS.map((t) => (
-            <TierCard key={t.name} tier={t} />
-          ))}
-        </div>
+        <MembershipTiers />
       </Section>
 
       {/* Newsletter */}
