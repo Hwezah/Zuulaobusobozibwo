@@ -75,7 +75,7 @@ export interface PriceTier {
 }
 
 /** Approx. USD→UGX conversion for the membership currency toggle. */
-export const USD_UGX = 3700; // TODO: confirm the rate with the client
+export const USD_UGX = 3800; // confirmed with client
 
 export interface MembershipTier {
   name: string;

@@ -53,7 +53,7 @@ export function MembershipTiers() {
         </div>
         <p className="text-[13px] text-muted-2">
           {cur === "UGX"
-            ? "Approx. at UGX 3,700 per $1 · pay by Mobile Money"
+            ? "Approx. at UGX 3,800 per $1 · pay by Mobile Money"
             : "Switch to UGX for the Mobile Money amount"}
         </p>
       </div>

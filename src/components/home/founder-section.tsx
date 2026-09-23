@@ -23,7 +23,7 @@ export function FounderSection() {
           }}
         />
         <CutoutImage
-          src="/assets/ceo-cutout-flip.png"
+          src="/assets/ceo-cutout-flip.webp"
           alt="Tumusiime Joseph Prosper, founder of Zuula Obusobozibwo"
           className="absolute bottom-0 left-0 w-full object-cover"
           style={{ height: "94%", objectPosition: "center top" }}

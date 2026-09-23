@@ -132,7 +132,7 @@ export function Hero() {
               style={{ animation: "floaty 6s ease-in-out infinite" }}
             >
               <CutoutImage
-                src="/assets/ceo-cutout-full.png"
+                src="/assets/ceo-cutout-full.webp"
                 alt="Tumusiime Joseph Prosper"
                 className="absolute bottom-0 right-0 h-full w-full object-contain"
                 style={{
