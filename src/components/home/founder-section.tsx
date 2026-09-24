@@ -5,7 +5,7 @@ import { FOUNDER } from "@/data/site";
 
 export function FounderSection() {
   return (
-    <div data-grid2 className="grid items-center gap-12 lg:grid-cols-2">
+    <div data-grid2 className="grid items-start gap-12 lg:grid-cols-2">
       {/* portrait — framed, flipped to face the copy */}
       <div
         className="relative aspect-[4/5] w-full overflow-hidden rounded-[24px] border border-[rgba(255,255,255,.12)]"
@@ -39,8 +39,8 @@ export function FounderSection() {
         />
       </div>
 
-      {/* copy */}
-      <div className="max-[560px]:text-center">
+      {/* copy — pinned while the taller portrait scrolls past */}
+      <div className="max-[560px]:text-center lg:sticky lg:top-24 lg:self-start">
         <span className="text-[12px] font-bold uppercase tracking-[0.16em] text-pink-hover">
           {FOUNDER.eyebrow}
         </span>

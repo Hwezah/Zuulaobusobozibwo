@@ -171,8 +171,8 @@ export function CheckoutView() {
   return (
     <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,380px)_1fr]">
       {/* Left: order summary (read-only) */}
-      <aside className="order-1">
-        <div data-cartpanel className="lg:sticky lg:top-24">
+      <aside className="order-1 lg:sticky lg:top-24 lg:self-start">
+        <div data-cartpanel>
           <div className="rounded-[18px] border border-border bg-card-2 p-6">
             <h2 className="font-display text-[17px] font-bold text-text">Order summary</h2>
             <ul className="mt-5 flex flex-col gap-4">
