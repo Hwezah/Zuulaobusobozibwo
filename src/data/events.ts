@@ -15,7 +15,7 @@ export const EVENTS: EventItem[] = [
     place: "Fidodido, Kampala",
     dateFull: "Saturday, 24th October 2026",
     time: "9:00 AM — 4:00 PM",
-    flyer: "/assets/kingdom-business-summit-2026-flyer.png",
+    flyer: "/assets/kingdom-business-summit-2026-flyer.webp",
     priceLabel: "from UGX 10K",
     cur: "UGX",
     blurb:

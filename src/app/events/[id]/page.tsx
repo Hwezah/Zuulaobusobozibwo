@@ -53,8 +53,8 @@ export default async function EventDetailPage({
             <Image
               src={event.flyer}
               alt={`${event.title} flyer`}
-              width={864}
-              height={1219}
+              width={766}
+              height={1080}
               className="h-auto w-full object-cover"
               priority
             />

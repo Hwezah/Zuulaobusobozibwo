@@ -79,8 +79,8 @@ export const USD_UGX = 3800; // confirmed with client
 
 export interface MembershipTier {
   name: string;
-  /** null = Free. Otherwise the monthly USD price the toggle converts. */
-  priceUsd: number | null;
+  /** null = Free. Authoritative price in UGX; the USD view is derived from it. */
+  priceUgx: number | null;
   per?: string;
   featured?: boolean;
   badge?: string;
@@ -94,26 +94,26 @@ export interface MembershipTier {
 export const MEMBERSHIP_TIERS: MembershipTier[] = [
   {
     name: "Free Community",
-    priceUsd: null,
+    priceUgx: null,
     feats: ["WhatsApp community group", "Weekly encouragement", "Free article library", "Event announcements"],
     btn: "Join on WhatsApp",
     action: "whatsappGroup",
   },
   {
     name: "Inner Circle",
-    priceUsd: 25,
+    priceUgx: 100000,
     per: "/month",
     featured: true,
     badge: "Most popular",
-    feats: ["Private Telegram community", "Monthly group coaching", "Members-only events", "Live Q&A with Joseph"],
+    feats: ["Private Telegram community group", "Monthly group coaching", "Members-only events", "Live Q&A with Joseph"],
     btn: "Join on Telegram",
     action: "telegramGroup",
   },
   {
     name: "One-on-One Mentorship & Guidance",
-    priceUsd: 50,
+    priceUgx: 200000,
     per: "/month",
-    feats: ["Personal sessions with Joseph", "Tailored guidance plan", "Direct accountability", "Priority event tickets"],
+    feats: ["Two-hour one-on-one session with Joseph", "1 month of Inner Circle included", "Tailored guidance plan", "Direct accountability"],
     btn: "Start mentorship",
     action: "mentorship",
   },

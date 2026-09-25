@@ -17,14 +17,14 @@ const ACTION_URL: Record<MembershipTier["action"], string> = {
 };
 
 function priceLabel(tier: MembershipTier, cur: Currency): string {
-  if (tier.priceUsd === null) return "Free";
+  if (tier.priceUgx === null) return "Free";
   return cur === "UGX"
-    ? "UGX " + Math.round((tier.priceUsd * USD_UGX) / 1000) + "K"
-    : "$" + tier.priceUsd;
+    ? "UGX " + Math.round(tier.priceUgx / 1000) + "K"
+    : "$" + Math.round(tier.priceUgx / USD_UGX);
 }
 
 export function MembershipTiers() {
-  const [cur, setCur] = useState<Currency>("USD");
+  const [cur, setCur] = useState<Currency>("UGX");
 
   return (
     <>
@@ -53,8 +53,8 @@ export function MembershipTiers() {
         </div>
         <p className="text-[13px] text-muted-2">
           {cur === "UGX"
-            ? "Approx. at UGX 3,800 per $1 · pay by Mobile Money"
-            : "Switch to UGX for the Mobile Money amount"}
+            ? "Exact price · pay by Mobile Money"
+            : "Approx. at UGX 3,800 per $1"}
         </p>
       </div>
 
@@ -81,7 +81,7 @@ export function MembershipTiers() {
               <span className="font-display text-[34px] font-extrabold leading-none text-text">
                 {priceLabel(tier, cur)}
               </span>
-              {tier.priceUsd !== null && tier.per && (
+              {tier.priceUgx !== null && tier.per && (
                 <span className="pb-1 text-[14px] text-muted">{tier.per}</span>
               )}
             </div>

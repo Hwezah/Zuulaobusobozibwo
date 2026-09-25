@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Zuula Obusobozibwo",
     description: "Not Just Priests — We are Kings Too.",
-    images: ["/assets/kingdom-business-summit-2026-flyer.png"],
+    images: ["/assets/kingdom-business-summit-2026-flyer.webp"],
     type: "website",
   },
 };
