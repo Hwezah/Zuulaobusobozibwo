@@ -43,7 +43,7 @@ export default function HomePage() {
 
       {/* Events */}
       <Section className="pt-0">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-wrap items-end justify-between gap-4 max-[560px]:flex-col max-[560px]:items-center max-[560px]:text-center">
           <div>
             <span className="text-[12px] font-bold uppercase tracking-[0.16em] text-pink-hover">
               Upcoming

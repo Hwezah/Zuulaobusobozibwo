@@ -15,16 +15,18 @@ export default function ContactPage() {
       <div className="grid gap-12 lg:grid-cols-[1fr_minmax(0,480px)]">
         {/* Left: reach us */}
         <div>
-          <span className="text-[13px] font-bold uppercase tracking-[0.18em] text-pink-hover">
-            Contact
-          </span>
-          <h1 className="mt-4 font-display text-[clamp(40px,5.5vw,60px)] font-extrabold leading-[1.02] tracking-[-1px] text-text">
-            We&apos;d love to <span className="text-gradient">hear from you</span>
-          </h1>
-          <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-muted">
-            Questions about events, mentorship or resources? Reach out any way
-            that suits you — we read every message.
-          </p>
+          <div className="max-[560px]:text-center">
+            <span className="text-[13px] font-bold uppercase tracking-[0.18em] text-pink-hover">
+              Contact
+            </span>
+            <h1 className="mt-4 font-display text-[clamp(40px,5.5vw,60px)] font-extrabold leading-[1.02] tracking-[-1px] text-text">
+              We&apos;d love to <span className="text-gradient">hear from you</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-muted max-[560px]:mx-auto">
+              Questions about events, mentorship or resources? Reach out any way
+              that suits you — we read every message.
+            </p>
+          </div>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {CONTACT_METHODS.map((m) => (

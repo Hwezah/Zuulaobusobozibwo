@@ -63,7 +63,7 @@ export default async function EventDetailPage({
 
         {/* Content */}
         <div className="flex flex-col gap-10">
-          <header>
+          <header className="max-[560px]:text-center">
             <span className="inline-flex items-center rounded-full border border-[rgba(255,45,149,.4)] bg-[rgba(255,45,149,.1)] px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-pink-hover">
               {event.edition ? `${event.edition} · ` : ""}
               {event.tag}

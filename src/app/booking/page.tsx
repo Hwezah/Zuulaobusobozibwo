@@ -21,16 +21,18 @@ export default function BookingPage() {
       <div className="grid gap-12 lg:grid-cols-[1fr_minmax(0,480px)]">
         {/* Left: pitch */}
         <div>
-          <span className="text-[13px] font-bold uppercase tracking-[0.18em] text-pink-hover">
-            {BOOKING_HERO.eyebrow}
-          </span>
-          <h1 className="mt-4 font-display text-[clamp(40px,5.5vw,60px)] font-extrabold leading-[1.02] tracking-[-1px] text-text">
-            {BOOKING_HERO.headA}
-            <span className="text-gradient">{BOOKING_HERO.headB}</span>
-          </h1>
-          <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-muted">
-            {BOOKING_HERO.sub}
-          </p>
+          <div className="max-[560px]:text-center">
+            <span className="text-[13px] font-bold uppercase tracking-[0.18em] text-pink-hover">
+              {BOOKING_HERO.eyebrow}
+            </span>
+            <h1 className="mt-4 font-display text-[clamp(40px,5.5vw,60px)] font-extrabold leading-[1.02] tracking-[-1px] text-text">
+              {BOOKING_HERO.headA}
+              <span className="text-gradient">{BOOKING_HERO.headB}</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-muted max-[560px]:mx-auto">
+              {BOOKING_HERO.sub}
+            </p>
+          </div>
 
           <hr className="my-8 border-t border-border" />
 
