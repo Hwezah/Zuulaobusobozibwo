@@ -10,6 +10,7 @@ import {
 } from "@/data/site";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -133,7 +134,7 @@ export function BookingForm() {
         <Input name="org" placeholder="Organization" aria-label="Organization" />
         <Input name="email" type="email" required placeholder="Email address" aria-label="Email address" />
         <Input name="phone" inputMode="tel" placeholder="Phone" aria-label="Phone" />
-        <Input name="date" type="date" placeholder="Preferred date" aria-label="Preferred date" className="text-muted" />
+        <DatePicker name="date" placeholder="Preferred date" aria-label="Preferred date" />
         <Select value={audience} onValueChange={setAudience}>
           <SelectTrigger aria-label="Audience size">
             <SelectValue placeholder="Audience size" />
