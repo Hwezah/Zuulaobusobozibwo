@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Lock, LockKeyhole, Check, BellRing, ShieldAlert, X, Ban, Undo2 } from "lucide-react";
+import { Lock, LockKeyhole, Check, ShieldAlert, Ban, Undo2 } from "lucide-react";
 import { useAdmin } from "@/context/admin-context";
 import { useOrders } from "@/context/orders-context";
 import { Chip } from "@/components/common";
@@ -56,7 +56,6 @@ function matchesFilter(order: Order, filter: Filter): boolean {
 interface RowActions {
   onConfirm: (order: Order) => void;
   onUnconfirm: (order: Order) => void;
-  onRemind: (order: Order) => void;
   onReject: (order: Order, reason: string) => void;
 }
 
@@ -112,7 +111,7 @@ function PinGate() {
 }
 
 function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
-  const [arming, setArming] = useState(false);
+  const [declining, setDeclining] = useState(false);
   const [reason, setReason] = useState("");
   const [unconfirming, setUnconfirming] = useState(false);
   const meta = statusMeta(order.status);
@@ -124,7 +123,7 @@ function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
     const r = reason.trim();
     if (!r) return;
     actions.onReject(order, r);
-    setArming(false);
+    setDeclining(false);
     setReason("");
   }
 
@@ -204,10 +203,10 @@ function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
                 variant="ghost"
                 shape="pill"
                 size="sm"
-                className="flex-[1.5_1_0] min-w-0 px-1.5"
-                onClick={() => actions.onRemind(order)}
+                className="flex-1 min-w-0 px-1.5 text-[#ff8a8a] hover:text-[#ff8a8a]"
+                onClick={() => setDeclining(true)}
               >
-                <BellRing className="h-4 w-4" /> Send reminder
+                <Ban className="h-4 w-4 max-[560px]:hidden" /> Decline
               </Button>
               <Button
                 shape="pill"
@@ -223,53 +222,43 @@ function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
           )}
         </div>
 
-        {/* Decline lives on its own line so the protected [data-ordact] row
-            stays one line, price-left / buttons-right, at every breakpoint. */}
-        {actionable &&
-          (arming ? (
-            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border pt-3">
-              <Input
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                placeholder="Reason (e.g. no payment received)"
-                className="h-9 min-w-0 flex-1 text-[13px]"
-                autoFocus
-                onKeyDown={(e) => e.key === "Enter" && decline()}
-              />
-              <Button
-                shape="pill"
-                size="sm"
-                variant="ghost"
-                className="shrink-0 text-[#ff8a8a] hover:text-[#ff8a8a]"
-                onClick={decline}
-                disabled={!reason.trim()}
-              >
-                <Ban className="h-4 w-4" /> Confirm decline
-              </Button>
-              <Button
-                shape="pill"
-                size="sm"
-                variant="subtle"
-                className="shrink-0"
-                onClick={() => {
-                  setArming(false);
-                  setReason("");
-                }}
-              >
-                Cancel
+        <Dialog
+          open={declining}
+          onOpenChange={(o) => {
+            setDeclining(o);
+            if (!o) setReason("");
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Decline this order?</DialogTitle>
+              <DialogDescription>
+                {order.name} · {order.ref} · {order.amountLabel}
+              </DialogDescription>
+            </DialogHeader>
+            <p className="text-[14px] leading-relaxed text-text-3">
+              Only decline if you could not find the Mobile Money payment. The order is
+              marked Declined and no ticket is issued. Please say why:
+            </p>
+            <Input
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Reason (e.g. no payment received)"
+              autoFocus
+              onKeyDown={(e) => e.key === "Enter" && decline()}
+            />
+            <div className="flex flex-wrap justify-end gap-2">
+              <DialogClose asChild>
+                <Button variant="subtle" shape="pill" size="sm">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button shape="pill" size="sm" onClick={decline} disabled={!reason.trim()}>
+                Yes, decline
               </Button>
             </div>
-          ) : (
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setArming(true)}
-                className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-muted-2 transition-colors hover:text-[#ff8a8a]"
-              >
-                <X className="h-3.5 w-3.5" /> Decline order
-              </button>
-            </div>
-          ))}
+          </DialogContent>
+        </Dialog>
 
         <Dialog open={unconfirming} onOpenChange={setUnconfirming}>
           <DialogContent>
@@ -361,9 +350,6 @@ export function AdminView() {
             })
             .then(load);
         },
-        onRemind: (o) => {
-          if (o.id) void fetch(`/api/admin/orders/${o.id}/remind`, { method: "POST" });
-        },
         onReject: (o, reason) => {
           if (!o.id) return;
           void fetch(`/api/admin/orders/${o.id}/reject`, {
@@ -376,7 +362,6 @@ export function AdminView() {
     : {
         onConfirm: (o) => demo.confirm(o.ref),
         onUnconfirm: (o) => demo.unconfirm(o.ref),
-        onRemind: (o) => demo.remind(o.ref),
         onReject: (o, reason) => demo.reject(o.ref, reason),
       };
 

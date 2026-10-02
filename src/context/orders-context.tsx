@@ -8,7 +8,6 @@ interface OrdersCtx {
   addOrder: (o: Order) => void;
   confirm: (ref: string) => void;
   unconfirm: (ref: string) => void;
-  remind: (ref: string) => void;
   reject: (ref: string, reason?: string) => void;
   pendingCount: number;
 }
@@ -18,7 +17,7 @@ const Ctx = createContext<OrdersCtx | null>(null);
 /**
  * Seed orders mirror the prototype's admin console. In production these come
  * from Supabase via /api/admin/orders — this context is the client-side demo
- * store that keeps the faked confirm/remind flow working without a database.
+ * store that keeps the faked confirm flow working without a database.
  */
 const SEED: Order[] = [
   { ref: "ZB-104882", name: "Sarah Nakato", phone: "0772 431 909", provider: "MTN Mobile Money", amount: 30000, amountLabel: "UGX 30,000", items: "1 × Kingdom Business Summit 2026 — VIP", when: "4 min ago", status: "pending" },
@@ -45,12 +44,6 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
-  const remind = useCallback(
-    (ref: string) =>
-      setOrders((s) => s.map((o) => (o.ref === ref ? { ...o, status: "reminded" } : o))),
-    [],
-  );
-
   // Confirmed orders never leave that state; a declined order is resolved, not
   // pending — so both are excluded from the "awaiting confirmation" count.
   const reject = useCallback(
@@ -70,7 +63,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   ).length;
 
   return (
-    <Ctx.Provider value={{ orders, addOrder, confirm, unconfirm, remind, reject, pendingCount }}>
+    <Ctx.Provider value={{ orders, addOrder, confirm, unconfirm, reject, pendingCount }}>
       {children}
     </Ctx.Provider>
   );
