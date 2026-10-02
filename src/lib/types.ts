@@ -4,7 +4,8 @@ export type ProductType =
   | "eBook"
   | "Paperback"
   | "Audiobook"
-  | "Event ticket";
+  | "Event ticket"
+  | "Membership";
 
 export interface Product {
   id: string;
@@ -13,6 +14,10 @@ export interface Product {
   priceVal: number;
   desc: string;
   img?: string;
+  /** digital goods: private download link texted to the buyer on Confirm */
+  downloadUrl?: string;
+  /** one line texted to the buyer on Confirm (group link, "we will call you…") */
+  fulfilNote?: string;
   /** cover art label used when no image is available */
   cover?: string;
   eventId?: string;

@@ -78,7 +78,7 @@ function PinGate() {
       <div>
         <h1 className="font-display text-[24px] font-extrabold text-text">Team access</h1>
         <p className="mt-2 text-[14px] text-muted">
-          Enter the team PIN to view ticket orders.
+          Enter the team PIN to view orders.
         </p>
       </div>
       <form onSubmit={submit} className="flex w-full flex-col gap-3">
@@ -164,7 +164,7 @@ function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
             </span>
             {isConfirmed && (
               <span data-smstail className="inline-flex items-center gap-1 text-[12px] text-ok max-[820px]:hidden">
-                <Check className="h-3.5 w-3.5" /> Ticket SMS sent
+                <Check className="h-3.5 w-3.5" /> Buyer SMS sent
               </span>
             )}
             {isFailed && (
@@ -269,10 +269,10 @@ function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
               </DialogDescription>
             </DialogHeader>
             <p className="text-[14px] leading-relaxed text-text-3">
-              This puts the order back to <strong>Pending</strong> and voids the ticket
-              code already texted to {order.phone}. Only do this if you confirmed by
-              mistake. If you confirm it again, a <strong>new</strong> ticket SMS is sent
-              with a new code.
+              This puts the order back to <strong>Pending</strong> and voids any
+              ticket codes already texted to {order.phone}. Only do this if you confirmed by
+              mistake. If you confirm it again, a <strong>new</strong> SMS is sent
+              (with new ticket codes, if any).
             </p>
             <div className="flex flex-wrap justify-end gap-2">
               <DialogClose asChild>
@@ -380,11 +380,11 @@ export function AdminView() {
             Team only
           </span>
           <h1 className="mt-2 font-display text-[clamp(30px,5vw,44px)] font-extrabold leading-[1.05] tracking-[-0.5px] text-text">
-            Ticket orders
+            Orders
           </h1>
           <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-muted">
             Check each order against the Mobile Money message on your phone, then
-            confirm. Confirming sends the buyer their ticket SMS automatically.
+            confirm. Confirming sends the buyer their confirmation SMS automatically — ticket code, download or group link, depending on what they bought.
           </p>
           <p className="mt-3 text-[14px] font-semibold text-pink-hover">
             {pendingCount} awaiting confirmation

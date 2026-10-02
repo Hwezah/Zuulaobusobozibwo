@@ -86,8 +86,12 @@ export interface MembershipTier {
   badge?: string;
   feats: string[];
   btn: string;
-  /** Which action the button performs. */
-  action: "whatsappGroup" | "telegramGroup" | "mentorship";
+  /** Paid tiers carry a `pid`: the button adds that product to the cart and the
+   *  normal Mobile Money checkout does the rest. Free tiers just open a link. */
+  pid?: string;
+  /** Texted to the buyer when the admin confirms the payment. */
+  sms?: string;
+  action: "whatsappGroup" | "buy";
 }
 
 /** Home page membership tiers (3 equal cards, middle one featured). */
@@ -106,16 +110,20 @@ export const MEMBERSHIP_TIERS: MembershipTier[] = [
     featured: true,
     badge: "Most popular",
     feats: ["Private Telegram community group", "Monthly group coaching", "Members-only events", "Live Q&A with Joseph"],
-    btn: "Join on Telegram",
-    action: "telegramGroup",
+    btn: "Join Inner Circle",
+    action: "buy",
+    pid: "m-inner",
+    sms: `Welcome to the Inner Circle! Join the private group: ${LINKS.telegramGroup}`,
   },
   {
     name: "One-on-One Mentorship & Guidance",
     priceUgx: 200000,
     per: "/month",
     feats: ["Two-hour one-on-one session with Joseph", "1 month of Inner Circle included", "Tailored guidance plan", "Direct accountability"],
-    btn: "Start mentorship",
-    action: "mentorship",
+    btn: "Book your session",
+    action: "buy",
+    pid: "m-1on1",
+    sms: `One-on-One: we will call you within 48 hrs to book your 2-hour session. Inner Circle: ${LINKS.telegramGroup}`,
   },
 ];
 
@@ -242,8 +250,8 @@ export const PAY_STEPS = [
 
 export const NEXT_STEPS = [
   { t: "We're checking your payment", d: "Our team receives your order details instantly and checks them against the Mobile Money confirmation on our phone." },
-  { t: "Payment confirmed", d: "You'll get a confirmation SMS with your ticket details and a welcome message for the summit." },
-  { t: "If we can't find it", d: "We'll send one courteous reminder with the pay-to number in case the transfer didn't go through. Unconfirmed orders expire after 24 hours — nothing is charged." },
+  { t: "Payment confirmed", d: "You'll get one confirmation SMS with whatever you bought: your ticket code, your download, or your group link." },
+  { t: "If we can't find it", d: "We'll reach out on the number you gave in case the transfer didn't go through. Unconfirmed orders expire after 24 hours — nothing is charged." },
 ];
 
 export const PRIVACY_SECTIONS = [

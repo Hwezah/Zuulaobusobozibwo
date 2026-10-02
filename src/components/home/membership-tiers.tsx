@@ -1,20 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LINKS, openUrl } from "@/config/links";
+import { useCart } from "@/context/cart-context";
 import { MEMBERSHIP_TIERS, USD_UGX, type MembershipTier } from "@/data/site";
 import { cn } from "@/lib/utils";
 
 type Currency = "USD" | "UGX";
-
-const ACTION_URL: Record<MembershipTier["action"], string> = {
-  whatsappGroup: LINKS.whatsappGroup,
-  telegramGroup: LINKS.telegramGroup,
-  mentorship: "/mentorship",
-};
 
 function priceLabel(tier: MembershipTier, cur: Currency): string {
   if (tier.priceUgx === null) return "Free";
@@ -25,6 +19,14 @@ function priceLabel(tier: MembershipTier, cur: Currency): string {
 
 export function MembershipTiers() {
   const [cur, setCur] = useState<Currency>("UGX");
+  const { add } = useCart();
+
+  // Paid tiers go through the normal cart + Mobile Money checkout; the free
+  // tier just opens its group link.
+  function choose(tier: MembershipTier) {
+    if (tier.pid) add(tier.pid);
+    else openUrl(LINKS.whatsappGroup);
+  }
 
   return (
     <>
@@ -95,24 +97,18 @@ export function MembershipTiers() {
               ))}
             </ul>
 
-            {tier.action === "mentorship" ? (
-              <Button
-                asChild
-                variant={tier.featured ? "primary" : "subtle"}
-                shape="pill"
-                className="mt-7 w-full"
-              >
-                <Link href="/mentorship">{tier.btn}</Link>
-              </Button>
-            ) : (
-              <Button
-                variant={tier.featured ? "primary" : "subtle"}
-                shape="pill"
-                className="mt-7 w-full"
-                onClick={() => openUrl(ACTION_URL[tier.action])}
-              >
-                {tier.btn}
-              </Button>
+            <Button
+              variant={tier.featured ? "primary" : "subtle"}
+              shape="pill"
+              className="mt-7 w-full"
+              onClick={() => choose(tier)}
+            >
+              {tier.btn}
+            </Button>
+            {tier.pid && (
+              <p className="mt-3 text-center text-[12px] text-muted-2">
+                Pay by Mobile Money · link sent by SMS
+              </p>
             )}
           </div>
         ))}

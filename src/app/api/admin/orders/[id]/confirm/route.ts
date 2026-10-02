@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { sendSms } from "@/lib/sms";
 import { makeTicketCode, ticketQrPayload, ticketSmsBodies } from "@/lib/ticket";
+import { fulfilmentForProductId, fulfilmentSmsBodies } from "@/lib/fulfilment";
 
 // node:crypto (ticket codes) needs the Node runtime, not edge.
 export const runtime = "nodejs";
 
 /**
- * Manual admin confirmation → issue tickets + text the buyer their code(s).
+ * Manual admin confirmation → fulfil each line by its kind (see lib/fulfilment)
+ * and text the buyer: ticket lines get codes, other lines a link / welcome note.
  *
  * Idempotency (PAYMENT_FLOW.md §6.1): the update flips pending->confirmed only
  * when the row is still pending, and `.select()` returns a row ONLY for the
@@ -42,14 +44,21 @@ export async function POST(
     return NextResponse.json({ ok: true, alreadyDone: true });
   }
 
-  // One ticket per seat. Seat multiplier is 1 for every tier today; if the
-  // client later says "A Table" seats N, multiply qty here — nothing else moves.
   const { data: items } = await supabase
     .from("order_items")
-    .select("product_id, tier, qty")
+    .select("product_id, title, tier, qty")
     .eq("order_id", id);
 
-  const rows = (items ?? []).flatMap((it) => {
+  const ticketItems = (items ?? []).filter(
+    (it) => fulfilmentForProductId(it.product_id) === "ticket",
+  );
+  const otherItems = (items ?? []).filter(
+    (it) => fulfilmentForProductId(it.product_id) !== "ticket",
+  );
+
+  // One ticket per seat. Seat multiplier is 1 for every tier today; if the
+  // client later says "A Table" seats N, multiply qty here — nothing else moves.
+  const rows = ticketItems.flatMap((it) => {
     const tier = it.tier ?? "General";
     return Array.from({ length: Math.max(1, it.qty) }, () => {
       const code = makeTicketCode(it.product_id);
@@ -62,18 +71,24 @@ export async function POST(
     if (ticketErr) {
       return NextResponse.json({ error: ticketErr.message }, { status: 500 });
     }
+  }
 
-    // Best-effort: a gateway failure must not undo a confirmed order.
-    const bodies = ticketSmsBodies(
+  // Best-effort: a gateway failure must not undo a confirmed order.
+  const bodies = [
+    ...ticketSmsBodies(
       order.ref,
       rows.map((r) => ({ tier: r.tier, code: r.code })),
-    );
-    await Promise.all(
-      bodies.map((body) =>
-        sendSms({ to: order.customer_phone, body, template: "ticket", orderId: order.id }),
-      ),
-    ).catch(() => {});
-  }
+    ),
+    ...fulfilmentSmsBodies(
+      order.ref,
+      otherItems.map((it) => ({ productId: it.product_id, title: it.title, qty: it.qty })),
+    ),
+  ];
+  await Promise.all(
+    bodies.map((body) =>
+      sendSms({ to: order.customer_phone, body, template: "fulfilment", orderId: order.id }),
+    ),
+  ).catch(() => {});
 
   return NextResponse.json({ ok: true, tickets: rows.length });
 }

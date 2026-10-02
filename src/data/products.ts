@@ -1,5 +1,6 @@
 import type { Product } from "@/lib/types";
 import { getTicketProducts } from "./events";
+import { MEMBERSHIP_TIERS } from "./site";
 
 const HOST = "https://midnightblue-stinkbug-675139.hostingersite.com/wp-content/uploads";
 
@@ -81,8 +82,25 @@ export const BOOKS: Product[] = [
 
 export const LIBRARY_FILTERS = ["All", "eBook"] as const;
 
-/** Books + ticket products, matching the prototype's getProducts(). */
-export const ALL_PRODUCTS: Product[] = [...BOOKS, ...getTicketProducts()];
+/** Paid membership tiers become cart products, priced from the tier data. */
+export const MEMBERSHIPS: Product[] = MEMBERSHIP_TIERS.flatMap((t) =>
+  t.pid && t.priceUgx
+    ? [
+        {
+          id: t.pid,
+          title: `${t.name} (1 month)`,
+          type: "Membership" as const,
+          priceVal: t.priceUgx,
+          desc: t.feats[0],
+          cover: "membership",
+          fulfilNote: t.sms,
+        },
+      ]
+    : [],
+);
+
+/** Everything the cart can sell: books, event tickets and paid memberships. */
+export const ALL_PRODUCTS: Product[] = [...BOOKS, ...getTicketProducts(), ...MEMBERSHIPS];
 
 export function getProductById(id: string): Product | undefined {
   return ALL_PRODUCTS.find((p) => p.id === id);

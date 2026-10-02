@@ -3,6 +3,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { makeRef, toE164, itemsSummary, type CheckoutItem } from "@/lib/order";
 import { notifyAdminNewOrder } from "@/lib/notify";
+import { getProductById } from "@/data/products";
 
 interface Body {
   name: string;
@@ -29,9 +30,27 @@ export async function POST(req: Request) {
   }
 
   const name = (body.name ?? "").trim();
-  const items = Array.isArray(body.items) ? body.items : [];
-  if (name.length < 3 || items.length === 0) {
+  const rawItems = Array.isArray(body.items) ? body.items : [];
+  if (name.length < 3 || rawItems.length === 0) {
     return NextResponse.json({ error: "Missing name or items" }, { status: 422 });
+  }
+
+  // The catalog is the source of truth for what an item is and costs — never
+  // the browser's copy — so the amount the admin checks is always the real one.
+  const items: CheckoutItem[] = [];
+  for (const raw of rawItems) {
+    const product = getProductById(String(raw.productId));
+    const qty = Math.floor(Number(raw.qty));
+    if (!product || !(qty >= 1)) {
+      return NextResponse.json({ error: "Unknown item in order" }, { status: 422 });
+    }
+    items.push({
+      productId: product.id,
+      title: product.title,
+      tier: raw.tier,
+      unitPrice: product.priceVal,
+      qty,
+    });
   }
 
   const ref = makeRef();

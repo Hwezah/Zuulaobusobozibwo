@@ -116,7 +116,7 @@ export function CheckoutView() {
           <p className="mt-3 text-[15px] leading-relaxed text-muted">
             We&apos;ve received your order for{" "}
             <span className="font-semibold text-text-3">{paidTotal}</span>. We&apos;ll
-            confirm your Mobile Money payment and send your ticket by SMS.
+            confirm your Mobile Money payment and send you a confirmation by SMS.
           </p>
         </div>
 
