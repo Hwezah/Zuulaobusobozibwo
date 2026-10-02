@@ -7,6 +7,7 @@ interface OrdersCtx {
   orders: Order[];
   addOrder: (o: Order) => void;
   confirm: (ref: string) => void;
+  unconfirm: (ref: string) => void;
   remind: (ref: string) => void;
   reject: (ref: string, reason?: string) => void;
   pendingCount: number;
@@ -36,6 +37,14 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
+  const unconfirm = useCallback(
+    (ref: string) =>
+      setOrders((s) =>
+        s.map((o) => (o.ref === ref && o.status === "confirmed" ? { ...o, status: "pending" } : o)),
+      ),
+    [],
+  );
+
   const remind = useCallback(
     (ref: string) =>
       setOrders((s) => s.map((o) => (o.ref === ref ? { ...o, status: "reminded" } : o))),
@@ -61,7 +70,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   ).length;
 
   return (
-    <Ctx.Provider value={{ orders, addOrder, confirm, remind, reject, pendingCount }}>
+    <Ctx.Provider value={{ orders, addOrder, confirm, unconfirm, remind, reject, pendingCount }}>
       {children}
     </Ctx.Provider>
   );

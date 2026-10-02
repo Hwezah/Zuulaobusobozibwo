@@ -1,12 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Lock, LockKeyhole, Check, BellRing, ShieldAlert, X, Ban } from "lucide-react";
+import { Lock, LockKeyhole, Check, BellRing, ShieldAlert, X, Ban, Undo2 } from "lucide-react";
 import { useAdmin } from "@/context/admin-context";
 import { useOrders } from "@/context/orders-context";
 import { Chip } from "@/components/common";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { Order } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -26,10 +34,10 @@ function statusMeta(status: Order["status"]) {
 type Filter = "pending" | "confirmed" | "failed" | "all";
 
 const FILTERS: { key: Filter; label: string }[] = [
+  { key: "all", label: "All" },
   { key: "pending", label: "Pending" },
   { key: "confirmed", label: "Confirmed" },
   { key: "failed", label: "Declined" },
-  { key: "all", label: "All" },
 ];
 
 function matchesFilter(order: Order, filter: Filter): boolean {
@@ -47,6 +55,7 @@ function matchesFilter(order: Order, filter: Filter): boolean {
 
 interface RowActions {
   onConfirm: (order: Order) => void;
+  onUnconfirm: (order: Order) => void;
   onRemind: (order: Order) => void;
   onReject: (order: Order, reason: string) => void;
 }
@@ -105,6 +114,7 @@ function PinGate() {
 function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
   const [arming, setArming] = useState(false);
   const [reason, setReason] = useState("");
+  const [unconfirming, setUnconfirming] = useState(false);
   const meta = statusMeta(order.status);
   const isConfirmed = order.status === "confirmed";
   const isFailed = order.status === "failed";
@@ -119,7 +129,13 @@ function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
   }
 
   return (
-    <div data-orderrow className="rounded-[18px] border border-border bg-card-2 p-5">
+    <div
+      data-orderrow
+      className={cn(
+        "rounded-[18px] border p-5",
+        isConfirmed ? "border-[var(--ok-border)] bg-[var(--ok-bg)]" : "border-border bg-card-2",
+      )}
+    >
       <div className="flex flex-col gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -158,6 +174,29 @@ function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
               </span>
             )}
           </div>
+
+          {isConfirmed && (
+            <div data-ordbtns className="flex min-w-0 flex-[1_1_0] items-center gap-2">
+              <Button
+                variant="ghost"
+                shape="pill"
+                size="sm"
+                className="flex-1 min-w-0 px-1.5"
+                onClick={() => setUnconfirming(true)}
+              >
+                <Undo2 className="h-4 w-4 max-[560px]:hidden" /> Unconfirm
+              </Button>
+              <Button
+                variant="outline"
+                shape="pill"
+                size="sm"
+                disabled
+                className="flex-1 min-w-0 border-[var(--ok-border)] px-1.5 text-ok disabled:opacity-100"
+              >
+                <Check className="h-4 w-4 max-[560px]:hidden" /> Confirmed
+              </Button>
+            </div>
+          )}
 
           {actionable && (
             <div data-ordbtns className="flex min-w-0 flex-[1_1_0] items-center gap-2">
@@ -232,6 +271,40 @@ function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
             </div>
           ))}
 
+        <Dialog open={unconfirming} onOpenChange={setUnconfirming}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Unconfirm this order?</DialogTitle>
+              <DialogDescription>
+                {order.name} · {order.ref}
+              </DialogDescription>
+            </DialogHeader>
+            <p className="text-[14px] leading-relaxed text-text-3">
+              This puts the order back to <strong>Pending</strong> and voids the ticket
+              code already texted to {order.phone}. Only do this if you confirmed by
+              mistake. If you confirm it again, a <strong>new</strong> ticket SMS is sent
+              with a new code.
+            </p>
+            <div className="flex flex-wrap justify-end gap-2">
+              <DialogClose asChild>
+                <Button variant="subtle" shape="pill" size="sm">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                shape="pill"
+                size="sm"
+                onClick={() => {
+                  actions.onUnconfirm(order);
+                  setUnconfirming(false);
+                }}
+              >
+                Yes, unconfirm
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {isFailed && order.reason && (
           <p className="border-t border-border pt-3 text-[12.5px] text-muted-2">
             <span className="font-semibold text-text-3">Declined:</span> {order.reason}
@@ -245,7 +318,7 @@ function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
 export function AdminView() {
   const { authed, lock } = useAdmin();
   const demo = useOrders();
-  const [filter, setFilter] = useState<Filter>("pending");
+  const [filter, setFilter] = useState<Filter>("all");
   // null = using the local demo store; array = server-backed (Supabase on).
   const [serverOrders, setServerOrders] = useState<Order[] | null>(null);
 
@@ -277,6 +350,17 @@ export function AdminView() {
           if (!o.id) return;
           void fetch(`/api/admin/orders/${o.id}/confirm`, { method: "POST" }).then(load);
         },
+        onUnconfirm: (o) => {
+          if (!o.id) return;
+          void fetch(`/api/admin/orders/${o.id}/unconfirm`, { method: "POST" })
+            .then(async (res) => {
+              if (!res.ok) {
+                const d = await res.json().catch(() => null);
+                window.alert(d?.error ?? "Could not unconfirm this order.");
+              }
+            })
+            .then(load);
+        },
         onRemind: (o) => {
           if (o.id) void fetch(`/api/admin/orders/${o.id}/remind`, { method: "POST" });
         },
@@ -291,6 +375,7 @@ export function AdminView() {
       }
     : {
         onConfirm: (o) => demo.confirm(o.ref),
+        onUnconfirm: (o) => demo.unconfirm(o.ref),
         onRemind: (o) => demo.remind(o.ref),
         onReject: (o, reason) => demo.reject(o.ref, reason),
       };
