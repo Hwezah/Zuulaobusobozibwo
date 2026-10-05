@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { sendSms } from "@/lib/sms";
 import { makeTicketCode, ticketQrPayload, ticketSmsBodies } from "@/lib/ticket";
 import { fulfilmentForProductId, fulfilmentSmsBodies } from "@/lib/fulfilment";
@@ -18,12 +19,14 @@ export const runtime = "nodejs";
  *
  * The SMS is best-effort and config-gated: sendSms() no-ops (logs) until an SMS
  * provider is configured, so confirming always succeeds even with no gateway.
- * TODO(auth): require an authenticated admin session + role; audit-log confirms.
+ * Guarded by requireAdmin() (signed session cookie). TODO: audit-log confirms.
  */
 export async function POST(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   const { id } = await params;
   const supabase = createServiceClient();
   if (!supabase) {

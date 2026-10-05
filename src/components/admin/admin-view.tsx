@@ -62,12 +62,17 @@ interface RowActions {
 function PinGate() {
   const { unlock } = useAdmin();
   const [pin, setPin] = useState("");
-  const [err, setErr] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!unlock(pin)) setErr(true);
-    else setPin("");
+    if (!pin.trim() || busy) return;
+    setBusy(true);
+    const res = await unlock(pin);
+    setBusy(false);
+    if (res.ok) setPin("");
+    else setErr(res.error ?? "Incorrect passcode.");
   }
 
   return (
@@ -78,34 +83,31 @@ function PinGate() {
       <div>
         <h1 className="font-display text-[24px] font-extrabold text-text">Team access</h1>
         <p className="mt-2 text-[14px] text-muted">
-          Enter the team PIN to view orders.
+          Enter the team passcode to view orders.
         </p>
       </div>
       <form onSubmit={submit} className="flex w-full flex-col gap-3">
         <Input
           type="password"
-          inputMode="numeric"
           value={pin}
           onChange={(e) => {
             setPin(e.target.value);
-            setErr(false);
+            setErr(null);
           }}
-          placeholder="••••"
-          className={cn("text-center tracking-[0.4em]", err && "border-[rgba(255,90,90,.65)]")}
+          placeholder="Passcode"
+          autoComplete="current-password"
+          className={cn("text-center", err && "border-[rgba(255,90,90,.65)]")}
           autoFocus
         />
         {err && (
           <span className="flex items-center justify-center gap-1.5 text-[13px] text-[#ff8a8a]">
-            <ShieldAlert className="h-4 w-4" /> Incorrect PIN — try again.
+            <ShieldAlert className="h-4 w-4 shrink-0" /> {err}
           </span>
         )}
-        <Button type="submit" shape="pill" className="w-full">
-          Unlock
+        <Button type="submit" shape="pill" className="w-full" disabled={busy}>
+          {busy ? "Checking…" : "Unlock"}
         </Button>
       </form>
-      <p className="text-[12px] text-muted-2">
-        Prototype gate — replace with real accounts before launch.
-      </p>
     </div>
   );
 }
@@ -305,7 +307,7 @@ function OrderRow({ order, actions }: { order: Order; actions: RowActions }) {
 }
 
 export function AdminView() {
-  const { authed, lock } = useAdmin();
+  const { authed, ready, lock, expire } = useAdmin();
   const demo = useOrders();
   const [filter, setFilter] = useState<Filter>("all");
   // null = using the local demo store; array = server-backed (Supabase on).
@@ -314,12 +316,16 @@ export function AdminView() {
   const load = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/orders");
+      if (res.status === 401) {
+        expire(); // session ended — show the passcode gate again
+        return;
+      }
       const data = await res.json();
       setServerOrders(data?.configured ? (data.orders ?? []) : null);
     } catch {
       setServerOrders(null); // network/offline — keep the demo store
     }
-  }, []);
+  }, [expire]);
 
   useEffect(() => {
     // load() only setState()s after `await fetch`, so this is not a synchronous
@@ -370,6 +376,7 @@ export function AdminView() {
   ).length;
   const visible = orders.filter((o) => matchesFilter(o, filter));
 
+  if (!ready) return null;
   if (!authed) return <PinGate />;
 
   return (

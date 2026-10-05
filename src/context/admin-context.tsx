@@ -2,54 +2,72 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
+interface UnlockResult {
+  ok: boolean;
+  error?: string;
+}
+
 interface AdminCtx {
   authed: boolean;
-  unlock: (pin: string) => boolean;
+  /** false until the first server session check finishes (avoids a login flash). */
+  ready: boolean;
+  unlock: (pin: string) => Promise<UnlockResult>;
   lock: () => void;
+  /** Call when an admin API returns 401 — the session ended; show the login again. */
+  expire: () => void;
 }
 
 const Ctx = createContext<AdminCtx | null>(null);
-const KEY = "zuula-team-auth";
 
 /**
- * Prototype-parity PIN gate (current year, e.g. "2026").
- * TODO(auth): replace with Supabase Auth — email/password or magic link,
- * server-side sessions, and role checks on every /api/admin/* route.
- * See BACKEND_SPEC.md "Admin auth".
+ * Admin sign-in state. The server owns the truth: a signed httpOnly cookie set
+ * by /api/admin/login and checked by every /api/admin/* route. This context
+ * only mirrors it so the screen knows whether to show the passcode gate.
  */
-function teamPin() {
-  return String(new Date().getFullYear());
-}
-
 export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    try {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only hydration from localStorage
-      if (localStorage.getItem(KEY) === teamPin()) setAuthed(true);
-    } catch {}
+    let alive = true;
+    fetch("/api/admin/session")
+      .then((r) => r.json())
+      .then((d) => alive && setAuthed(Boolean(d?.authed)))
+      .catch(() => {})
+      .finally(() => alive && setReady(true));
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  const unlock = useCallback((pin: string) => {
-    if (pin.trim() === teamPin()) {
-      try {
-        localStorage.setItem(KEY, teamPin());
-      } catch {}
-      setAuthed(true);
-      return true;
+  const unlock = useCallback(async (pin: string): Promise<UnlockResult> => {
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin }),
+      });
+      if (res.ok) {
+        setAuthed(true);
+        return { ok: true };
+      }
+      const d = await res.json().catch(() => null);
+      return { ok: false, error: d?.error ?? "Could not sign in." };
+    } catch {
+      return { ok: false, error: "Network error — try again." };
     }
-    return false;
   }, []);
 
   const lock = useCallback(() => {
-    try {
-      localStorage.removeItem(KEY);
-    } catch {}
+    void fetch("/api/admin/logout", { method: "POST" }).catch(() => {});
     setAuthed(false);
   }, []);
 
-  return <Ctx.Provider value={{ authed, unlock, lock }}>{children}</Ctx.Provider>;
+  const expire = useCallback(() => setAuthed(false), []);
+
+  return (
+    <Ctx.Provider value={{ authed, ready, unlock, lock, expire }}>{children}</Ctx.Provider>
+  );
 }
 
 export function useAdmin() {

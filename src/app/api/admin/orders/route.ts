@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { ugx } from "@/lib/utils";
 import type { Order, OrderStatus } from "@/lib/types";
 
@@ -8,8 +9,8 @@ import type { Order, OrderStatus } from "@/lib/types";
  * team panel reflects what buyers submit (on any device). Until then it reports
  * { configured: false } and the panel falls back to its local demo store.
  *
- * HOLD SPOT (auth): gate this behind an authenticated admin session before it
- * returns buyer data — never rely on the UI PIN alone (PAYMENT_FLOW.md §5).
+ * Guarded by requireAdmin(): buyer data is only returned to a logged-in admin
+ * session, never on the strength of the UI PIN alone (PAYMENT_FLOW.md §5).
  */
 interface OrderRow {
   id: string;
@@ -66,6 +67,8 @@ function rowToOrder(r: OrderRow): Order {
 }
 
 export async function GET(req: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   const supabase = createServiceClient();
   if (!supabase) {
     return NextResponse.json({ configured: false, orders: [] });

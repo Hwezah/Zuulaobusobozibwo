@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/admin-auth";
 
 /**
  * Undo a mistaken confirmation: confirmed -> pending, tickets voided.
@@ -8,12 +9,14 @@ import { createServiceClient } from "@/lib/supabase/server";
  * than duplicating codes; the code the buyer was already texted stops being
  * valid. No SMS is sent here. The `.eq("status","confirmed")` guard makes a
  * double-tap a harmless no-op. Refused if any ticket was already checked in at
- * the door. TODO(auth): require an authenticated admin session + audit-log.
+ * the door. Guarded by requireAdmin() (signed session cookie). TODO: audit-log.
  */
 export async function POST(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   const { id } = await params;
   const supabase = createServiceClient();
   if (!supabase) {
